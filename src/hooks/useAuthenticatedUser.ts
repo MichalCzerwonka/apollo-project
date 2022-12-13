@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { redirect } from 'react-router-dom';
+//import { redirect } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export const useAuthenticatedUser = () => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [isAuthenticated, setIsAuthenticated] = useState(!!token);
+
+  let navigate = useNavigate();
 
   useEffect(() => {
     const newToken = localStorage.getItem('token');
@@ -12,8 +15,9 @@ export const useAuthenticatedUser = () => {
   }, [localStorage.getItem('token')]);
 
   const logout = () => {
+    console.log('logout');
     localStorage.removeItem('token');
-    redirect('/login');
+    navigate('/login');
   };
 
   return {
