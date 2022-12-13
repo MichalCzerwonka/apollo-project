@@ -6,10 +6,15 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 
-export default function Clients() {
-    const [client, setClient] = useState('');
+type Film = {
+  label: string;
+  year: number;
+}
 
-    const top100Films = [
+export default function Clients() {
+    const [client, setClient] = useState<string | number>('');
+
+    const top100Films: Film[] = [
         { label: 'The Shawshank Redemption', year: 1994 },
         { label: 'City of God', year: 2002 },
         { label: 'Se7en', year: 1995 },
@@ -64,8 +69,13 @@ export default function Clients() {
                     disablePortal
                     freeSolo
                     id="combo-box-demo"
-                    onChange={(event: any, newValue: string | null) => {
-                        setClient(newValue);
+                    onChange={(_event, newValue: string | Film | null) => {
+                        if(typeof newValue === 'string'){
+                          setClient(newValue);
+                        }
+                        if(typeof newValue !== 'string' && newValue?.year){
+                          setClient(newValue.year);
+                        }
                         console.log(newValue);
                     }}
                     options={top100Films}
