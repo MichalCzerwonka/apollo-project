@@ -9,6 +9,11 @@ import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import Alert, { AlertProps } from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import CloseIcon from '@mui/icons-material/Close';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Copyright from '../Copyright';
@@ -19,8 +24,13 @@ import { useForm } from 'react-hook-form';
 import { login, LoginData } from '../../api/account';
 import { loginSchema } from '../../validators/account';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useState } from 'react';
 
 export default function SignIn() {
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+
   const { isAuthenticated } = useAuthenticatedUser();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>({
     resolver: yupResolver(loginSchema),
@@ -29,10 +39,22 @@ export default function SignIn() {
   let navigate = useNavigate();
 
   const handleLogin = (data: LoginData) => {
-    login(data).then(() => {
+    login(data).then((res) => {
+      localStorage.setItem('token', res.data);
       navigate('/');
-    });
+    })
+      .catch((error) => {
+        setErrorMessage(error.response.data.message);
+        setOpenSnackbar(true);
+        console.log(error.response.data);
+      });
   };
+
+  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+  }
 
   if (isAuthenticated) {
     return <Navigate to={'/'} replace />;
@@ -40,6 +62,7 @@ export default function SignIn() {
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
+
       <CssBaseline />
       <Grid
         item
@@ -65,6 +88,29 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
+          <Snackbar
+            open={openSnackbar}
+            onClose={handleCloseSnackbar}
+          >
+            <Alert severity="error"
+              sx={{ width: '100%' }}
+
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setOpenSnackbar(false);
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }>
+              <AlertTitle>Błąd logowania</AlertTitle>
+              {errorMessage}
+            </Alert>
+          </Snackbar>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
