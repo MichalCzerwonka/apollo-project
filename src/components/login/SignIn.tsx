@@ -14,123 +14,114 @@ import Typography from '@mui/material/Typography';
 import Copyright from '../Copyright';
 import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
 import { Navigate } from 'react-router-dom';
-import Api from '../../api/Api';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { login, LoginData } from '../../api/account';
+import { loginSchema } from '../../validators/account';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 export default function SignIn() {
-    const { isAuthenticated } = useAuthenticatedUser();
-    let navigate = useNavigate();
+  const { isAuthenticated } = useAuthenticatedUser();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginData>({
+    resolver: yupResolver(loginSchema),
+  });
 
-    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log("Data: " + data);
+  let navigate = useNavigate();
 
-        Api.get("account/login", { params: { Login: data.get('login'), Haslo: data.get('password') } })
-            .then(res => {
-                localStorage.setItem('token', res.data);
-                navigate('/');
-            })
-            .catch(error => {
-                console.log(error);
-            });
+  const handleLogin = (data: LoginData) => {
+    login(data).then(() => {
+      navigate('/');
+    });
+  };
 
-        console.log({
-            login: data.get('login'),
-            password: data.get('password'),
-        });
+  if (isAuthenticated) {
+    return <Navigate to={'/'} replace />;
+  }
 
-        // localStorage.setItem('token', tokenZBackendu);
-        // import { redirect } from "react-router-dom";
-        // redirect('/dashboard');
-    };
-
-    if (isAuthenticated) {
-        return <Navigate to={'/'} replace />;
-    }
-
-    return (
-        <Grid container component="main" sx={{ height: '100vh' }}>
-            <CssBaseline />
-            <Grid
-                item
-                xs={false}
-                sm={4}
-                md={7}
-                sx={{
-                    backgroundImage: 'url(https://source.unsplash.com/random)',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundColor: (t) =>
-                        t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                }}
+  return (
+    <Grid container component="main" sx={{ height: '100vh' }}>
+      <CssBaseline />
+      <Grid
+        item
+        xs={false}
+        sm={4}
+        md={7}
+        sx={{
+          backgroundImage: 'url(https://source.unsplash.com/random)',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: (t) =>
+            t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+      <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+        <Box
+          sx={{
+            my: 8,
+            mx: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Logowanie
+          </Typography>
+          <Box component="form" noValidate onSubmit={handleSubmit(handleLogin)} sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="login"
+              label="Login"
+              autoComplete="login"
+              autoFocus
+              error={!!errors?.login}
+              {...register('login')}
             />
-            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-                <Box
-                    sx={{
-                        my: 8,
-                        mx: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Logowanie
-                    </Typography>
-                    <Box component="form" noValidate onSubmit={handleLogin} sx={{ mt: 1 }}>
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="login"
-                            label="Login"
-                            name="login"
-                            autoComplete="login"
-                            autoFocus
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Hasło"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Zapamiętaj mnie"
-                        />
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
-                        >
-                            Zaloguj
-                        </Button>
-                        <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Zapomniałeś hasła?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="#" variant="body2">
-                                    {'Utwórz konto'}
-                                </Link>
-                            </Grid>
-                        </Grid>
-                        <Copyright sx={{ mt: 5 }} />
-                    </Box>
-                </Box>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Hasło"
+              type="password"
+              id="password"
+              error={!!errors?.password}
+              autoComplete="current-password"
+              {...register('password')}
+            />
+            <FormControlLabel
+              control={<Checkbox value="remember" color="primary" />}
+              label="Zapamiętaj mnie"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Zaloguj
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link href="#" variant="body2">
+                  Zapomniałeś hasła?
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href="#" variant="body2">
+                  {'Utwórz konto'}
+                </Link>
+              </Grid>
             </Grid>
-        </Grid>
-    );
+            <Copyright sx={{ mt: 5 }} />
+          </Box>
+        </Box>
+      </Grid>
+    </Grid>
+  );
 }
