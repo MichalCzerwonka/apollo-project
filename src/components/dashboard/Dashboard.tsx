@@ -12,6 +12,8 @@ import { Outlet } from 'react-router-dom';
 const drawerWidth = 256;
 
 export default function Dashboard() {
+
+  //localStorage.getItem('token', res.data)
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
 

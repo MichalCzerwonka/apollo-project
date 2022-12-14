@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-//import { redirect } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
+import { logoutAccount } from '../api/ApiAccount';
 
 export const useAuthenticatedUser = () => {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -15,8 +15,12 @@ export const useAuthenticatedUser = () => {
   }, [localStorage.getItem('token')]);
 
   const logout = () => {
-    console.log('logout');
-    localStorage.removeItem('token');
+    console.log('Logging out');
+    const token = localStorage.getItem('token');
+    if(token){
+      logoutAccount();
+    }
+    localStorage.clear();
     navigate('/login');
   };
 
@@ -24,4 +28,6 @@ export const useAuthenticatedUser = () => {
     isAuthenticated: isAuthenticated,
     logout,
   };
+
+
 };

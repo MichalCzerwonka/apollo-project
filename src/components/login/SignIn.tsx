@@ -21,7 +21,7 @@ import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { login, LoginData } from '../../api/account';
+import { loginAccount, LoginData } from '../../api/ApiAccount';
 import { loginSchema } from '../../validators/account';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
@@ -39,8 +39,12 @@ export default function SignIn() {
   let navigate = useNavigate();
 
   const handleLogin = (data: LoginData) => {
-    login(data).then((res) => {
-      localStorage.setItem('token', res.data);
+    loginAccount(data).then((res) => {
+
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('login', res.data.login);
+      localStorage.setItem('name', res.data.name);
+      localStorage.setItem('roleId', res.data.roleId.toString());
       navigate('/');
     })
       .catch((error) => {
@@ -90,6 +94,7 @@ export default function SignIn() {
         >
           <Snackbar
             open={openSnackbar}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             onClose={handleCloseSnackbar}
           >
             <Alert severity="error"

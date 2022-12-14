@@ -5,29 +5,41 @@ import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { getClients } from '../../api/ApiClients';
+import { useEffect } from 'react';
+import { Client } from '../../api/ApiClients';
 
-type Film = {
-  label: string;
-  year: number;
-}
+// type Film = {
+//     label: string;
+//     year: number;
+// }
 
 export default function Clients() {
-    const [client, setClient] = useState<string | number>('');
+    const [clients, setClients] = useState<Client[]>([]);
+    const [selectedClient, setselectedClient] = useState<Client>();
 
-    const top100Films: Film[] = [
-        { label: 'The Shawshank Redemption', year: 1994 },
-        { label: 'City of God', year: 2002 },
-        { label: 'Se7en', year: 1995 },
-        { label: 'The Silence of the Lambs', year: 1991 },
-        { label: "It's a Wonderful Life", year: 1946 },
-        { label: 'Life Is Beautiful', year: 1997 },
-        { label: 'The Usual Suspects', year: 1995 },
-        { label: 'Léon: The Professional', year: 1994 },
-        { label: 'Spirited Away', year: 2001 },
-        { label: 'Saving Private Ryan', year: 1998 },
-        { label: 'Once Upon a Time in the West', year: 1968 },
-        { label: 'American History X', year: 1998 },
-        { label: 'Interstellar', year: 2014 },];
+    useEffect(() => {
+        getClients().then((res) => {
+            setClients(res.data);
+            console.log(res.data);
+        });
+    }, [])
+
+
+    // const top100Films: Film[] = [
+    //     { label: 'The Shawshank Redemption', year: 1994 },
+    //     { label: 'City of God', year: 2002 },
+    //     { label: 'Se7en', year: 1995 },
+    //     { label: 'The Silence of the Lambs', year: 1991 },
+    //     { label: "It's a Wonderful Life", year: 1946 },
+    //     { label: 'Life Is Beautiful', year: 1997 },
+    //     { label: 'The Usual Suspects', year: 1995 },
+    //     { label: 'Léon: The Professional', year: 1994 },
+    //     { label: 'Spirited Away', year: 2001 },
+    //     { label: 'Saving Private Ryan', year: 1998 },
+    //     { label: 'Once Upon a Time in the West', year: 1968 },
+    //     { label: 'American History X', year: 1998 },
+    //     { label: 'Interstellar', year: 2014 },];
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 100, sortable: true, },
@@ -67,18 +79,20 @@ export default function Clients() {
             <FormControl fullWidth>
                 <Autocomplete
                     disablePortal
+                    autoHighlight
                     freeSolo
                     id="combo-box-demo"
-                    onChange={(_event, newValue: string | Film | null) => {
-                        if(typeof newValue === 'string'){
-                          setClient(newValue);
-                        }
-                        if(typeof newValue !== 'string' && newValue?.year){
-                          setClient(newValue.year);
-                        }
-                        console.log(newValue);
-                    }}
-                    options={top100Films}
+                    // onChange={(newValue: string | Client | null) => {
+                    //     if (typeof newValue === 'string' || typeof newValue === null || typeof newValue === undefined) 
+                    //     {
+                    //     }
+                    //     else
+                    //     {
+                    //         setselectedClient(newValue);
+                    //     }
+                    // }}
+                    options={clients}
+
                     sx={{ width: '100%' }}
                     renderInput={(params) => <TextField {...params} label="Kontrahent" />}
                 />

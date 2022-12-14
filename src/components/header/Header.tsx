@@ -10,9 +10,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuthenticatedUser } from '../../hooks/useAuthenticatedUser';
-// import Typography from '@mui/material/Typography';
-
-// const lightColor = 'rgba(255, 255, 255, 0.7)';
+import Divider from '@mui/material/Divider';
 
 interface HeaderProps {
     onDrawerToggle: () => void;
@@ -78,6 +76,8 @@ export default function Header(props: HeaderProps) {
                                     horizontal: 'left',
                                 }}
                             >
+                                <MenuItem>{localStorage.getItem('name')}</MenuItem>
+                                <Divider />
                                 <MenuItem onClick={handleClose}>Profil</MenuItem>
                                 <MenuItem onClick={handleClose}>Ustawienia</MenuItem>
                                 <MenuItem onClick={logout}>Wyloguj</MenuItem>
