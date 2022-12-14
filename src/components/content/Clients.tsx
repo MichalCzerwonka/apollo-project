@@ -14,97 +14,131 @@ import { Client } from '../../api/ApiClients';
 //     year: number;
 // }
 
+const mocked = [{
+  id: 1,
+  typ: 23,
+  kod: 'ARGND',
+  nazwa1: 'GND',
+  nazwa2: 'ARCUSSOFT',
+  miasto: 'Grodzisko Nowe',
+  nip: '8161706324',
+  ulica: 'string',
+  kodPocztowy: 'string',
+  poczta: 'string',
+  telefon: 'string',
+  email: 'string',
+  opeUtworzyl: 12,
+  dataUtworzenia: 12,
+  opeModyfikowal: 12,
+  dataModyfikacji: 12
+},
+  {
+    id: 1,
+    typ: 23,
+    kod: 'ARGND',
+    nazwa1: 'GND',
+    nazwa2: 'AR TESTOWA FIRMA',
+    miasto: 'Grodzisko Nowe',
+    nip: '8161706324',
+    ulica: 'string',
+    kodPocztowy: 'string',
+    poczta: 'string',
+    telefon: 'string',
+    email: 'string',
+    opeUtworzyl: 12,
+    dataUtworzenia: 12,
+    opeModyfikowal: 12,
+    dataModyfikacji: 12
+  }];
+
 export default function Clients() {
-    const [clients, setClients] = useState<Client[]>([]);
-    const [selectedClient, setselectedClient] = useState<Client>();
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClient, setselectedClient] = useState<Client>();
 
-    useEffect(() => {
-        getClients().then((res) => {
-            setClients(res.data);
-            console.log(res.data);
-        });
-    }, [])
+  useEffect(() => {
+    getClients().then((res) => {
 
 
-    // const top100Films: Film[] = [
-    //     { label: 'The Shawshank Redemption', year: 1994 },
-    //     { label: 'City of God', year: 2002 },
-    //     { label: 'Se7en', year: 1995 },
-    //     { label: 'The Silence of the Lambs', year: 1991 },
-    //     { label: "It's a Wonderful Life", year: 1946 },
-    //     { label: 'Life Is Beautiful', year: 1997 },
-    //     { label: 'The Usual Suspects', year: 1995 },
-    //     { label: 'Léon: The Professional', year: 1994 },
-    //     { label: 'Spirited Away', year: 2001 },
-    //     { label: 'Saving Private Ryan', year: 1998 },
-    //     { label: 'Once Upon a Time in the West', year: 1968 },
-    //     { label: 'American History X', year: 1998 },
-    //     { label: 'Interstellar', year: 2014 },];
+      setClients(res.data);
+      console.log(res.data);
+    })
+      // Usun to mockuje sobie dane bo nie mam API
+      .finally(() => {
+        setClients(mocked);
+      });
+  }, []);
 
-    const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 100, sortable: true, },
-        { field: 'firstName', headerName: 'First name', width: 130, sortable: true, },
-        { field: 'lastName', headerName: 'Last name', width: 130, sortable: true, },
-        {
-            field: 'age',
-            headerName: 'Age',
-            type: 'number',
-            width: 90,
-            sortable: true,
-        },
-        {
-            field: 'fullName',
-            headerName: 'Full name',
-            description: 'This column has a value getter and is not sortable.',
-            sortable: false,
-            valueGetter: (params: GridValueGetterParams) =>
-                `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-        },
-    ];
 
-    const rows = [
-        { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-        { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-        { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-        { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-        { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-        { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-        { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-        { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-        { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-    ];
+  // const top100Films: Film[] = [
+  //     { label: 'The Shawshank Redemption', year: 1994 },
+  //     { label: 'City of God', year: 2002 },
+  //     { label: 'Se7en', year: 1995 },
+  //     { label: 'The Silence of the Lambs', year: 1991 },
+  //     { label: "It's a Wonderful Life", year: 1946 },
+  //     { label: 'Life Is Beautiful', year: 1997 },
+  //     { label: 'The Usual Suspects', year: 1995 },
+  //     { label: 'Léon: The Professional', year: 1994 },
+  //     { label: 'Spirited Away', year: 2001 },
+  //     { label: 'Saving Private Ryan', year: 1998 },
+  //     { label: 'Once Upon a Time in the West', year: 1968 },
+  //     { label: 'American History X', year: 1998 },
+  //     { label: 'Interstellar', year: 2014 },];
 
-    return (
-        <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
-                <Autocomplete
-                    disablePortal
-                    autoHighlight
-                    freeSolo
-                    id="combo-box-demo"
-                    // onChange={(newValue: string | Client | null) => {
-                    //     if (typeof newValue === 'string' || typeof newValue === null || typeof newValue === undefined) 
-                    //     {
-                    //     }
-                    //     else
-                    //     {
-                    //         setselectedClient(newValue);
-                    //     }
-                    // }}
-                    options={clients}
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 100, sortable: true, },
+    { field: 'firstName', headerName: 'First name', width: 130, sortable: true, },
+    { field: 'lastName', headerName: 'Last name', width: 130, sortable: true, },
+    {
+      field: 'age',
+      headerName: 'Age',
+      type: 'number',
+      width: 90,
+      sortable: true,
+    },
+    {
+      field: 'fullName',
+      headerName: 'Full name',
+      description: 'This column has a value getter and is not sortable.',
+      sortable: false,
+      valueGetter: (params: GridValueGetterParams) =>
+        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+    },
+  ];
 
-                    sx={{ width: '100%' }}
-                    renderInput={(params) => <TextField {...params} label="Kontrahent" />}
-                />
-            </FormControl>
-            <div style={{ height: 400, width: '100%' }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5]}
-                />
-            </div>
-        </Box>
-    );
+  const rows = [
+    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
+    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
+    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
+    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
+    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
+    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+  ];
+
+  return (
+    <Box sx={{ minWidth: 120 }}>
+      <FormControl fullWidth>
+        <Autocomplete
+          disablePortal
+          autoHighlight
+          freeSolo
+          id="combo-box-demo"
+          options={clients.map((client) => ({ id: client.id, label: client.nazwa2 }))}
+
+          sx={{ width: '100%' }}
+          renderInput={(params) => <TextField {...params} label="Kontrahent" />}
+        />
+      </FormControl>
+      <div style={{ height: 400, width: '100%' }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5]}
+        />
+      </div>
+    </Box>
+  );
 }
