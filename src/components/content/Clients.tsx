@@ -1,143 +1,161 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import FormControl from '@mui/material/FormControl';
+import Grid from '@mui/material/Grid';
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Button from '@mui/material/Button';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import CreateIcon from '@mui/icons-material/Create';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { getClients } from '../../api/ApiClients';
+import Checkbox from '@mui/material/Checkbox';
+import { getClients, getSelectedClient } from '../../api/ApiClients';
 import { useEffect } from 'react';
 import { Client } from '../../api/ApiClients';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 // type Film = {
 //     label: string;
 //     year: number;
 // }
 
-const mocked = [{
-  id: 1,
-  typ: 23,
-  kod: 'ARGND',
-  nazwa1: 'GND',
-  nazwa2: 'ARCUSSOFT',
-  miasto: 'Grodzisko Nowe',
-  nip: '8161706324',
-  ulica: 'string',
-  kodPocztowy: 'string',
-  poczta: 'string',
-  telefon: 'string',
-  email: 'string',
-  opeUtworzyl: 12,
-  dataUtworzenia: 12,
-  opeModyfikowal: 12,
-  dataModyfikacji: 12
-},
-  {
-    id: 1,
-    typ: 23,
-    kod: 'ARGND',
-    nazwa1: 'GND',
-    nazwa2: 'AR TESTOWA FIRMA',
-    miasto: 'Grodzisko Nowe',
-    nip: '8161706324',
-    ulica: 'string',
-    kodPocztowy: 'string',
-    poczta: 'string',
-    telefon: 'string',
-    email: 'string',
-    opeUtworzyl: 12,
-    dataUtworzenia: 12,
-    opeModyfikowal: 12,
-    dataModyfikacji: 12
-  }];
+// const mocked = [{
+//   id: 1,
+//   typ: 23,
+//   kod: 'ARGND',
+//   nazwa1: 'GND',
+//   nazwa2: 'ARCUSSOFT',
+//   miasto: 'Grodzisko Nowe',
+//   nip: '8161706324',
+//   ulica: 'string',
+//   kodPocztowy: 'string',
+//   poczta: 'string',
+//   telefon: 'string',
+//   email: 'string',
+//   opeUtworzyl: 12,
+//   dataUtworzenia: 12,
+//   opeModyfikowal: 12,
+//   dataModyfikacji: 12
+// },
+//   {
+//     id: 1,
+//     typ: 23,
+//     kod: 'ARGND',
+//     nazwa1: 'GND',
+//     nazwa2: 'AR TESTOWA FIRMA',
+//     miasto: 'Grodzisko Nowe',
+//     nip: '8161706324',
+//     ulica: 'string',
+//     kodPocztowy: 'string',
+//     poczta: 'string',
+//     telefon: 'string',
+//     email: 'string',
+//     opeUtworzyl: 12,
+//     dataUtworzenia: 12,
+//     opeModyfikowal: 12,
+//     dataModyfikacji: 12
+//   }];
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
-  const [selectedClient, setselectedClient] = useState<Client>();
+  const [selectedClient, setSelectedClient] = useState<Client>();
 
   useEffect(() => {
     getClients().then((res) => {
-
-
       setClients(res.data);
+    })
+
+    getSelectedClient(2).then((res) => {
+      setSelectedClient(res.data);
       console.log(res.data);
     })
-      // Usun to mockuje sobie dane bo nie mam API
-      .finally(() => {
-        setClients(mocked);
-      });
   }, []);
 
 
-  // const top100Films: Film[] = [
-  //     { label: 'The Shawshank Redemption', year: 1994 },
-  //     { label: 'City of God', year: 2002 },
-  //     { label: 'Se7en', year: 1995 },
-  //     { label: 'The Silence of the Lambs', year: 1991 },
-  //     { label: "It's a Wonderful Life", year: 1946 },
-  //     { label: 'Life Is Beautiful', year: 1997 },
-  //     { label: 'The Usual Suspects', year: 1995 },
-  //     { label: 'Léon: The Professional', year: 1994 },
-  //     { label: 'Spirited Away', year: 2001 },
-  //     { label: 'Saving Private Ryan', year: 1998 },
-  //     { label: 'Once Upon a Time in the West', year: 1968 },
-  //     { label: 'American History X', year: 1998 },
-  //     { label: 'Interstellar', year: 2014 },];
 
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 100, sortable: true, },
-    { field: 'firstName', headerName: 'First name', width: 130, sortable: true, },
-    { field: 'lastName', headerName: 'Last name', width: 130, sortable: true, },
-    {
-      field: 'age',
-      headerName: 'Age',
-      type: 'number',
-      width: 90,
-      sortable: true,
-    },
-    {
-      field: 'fullName',
-      headerName: 'Full name',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      valueGetter: (params: GridValueGetterParams) =>
-        `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
-  ];
-
-  const rows = [
-    { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+  const informationTableDef: GridColDef[] = [
+    { field: 'kitId', headerName: 'ID typu', width: 100, sortable: true, },
+    { field: 'nazwa', headerName: 'Nazwa', width: 130, sortable: true, },
   ];
 
   return (
     <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth>
-        <Autocomplete
-          disablePortal
-          autoHighlight
-          freeSolo
-          id="combo-box-demo"
-          options={clients.map((client) => ({ id: client.id, label: client.nazwa2 }))}
+      <Grid container spacing={2}>
+        <Grid item xs={10}>
+          <Autocomplete
+            disablePortal
+            autoHighlight
+            freeSolo
+            id="combo-box-demo"
+            // onChange={(event: any, newValue: string | { id: number; label: string; }) => {
+            //   if (typeof (newValue) === "string") {
 
-          sx={{ width: '100%' }}
-          renderInput={(params) => <TextField {...params} label="Kontrahent" />}
-        />
-      </FormControl>
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5]}
-        />
+            //   }
+            //   else {
+            //     console.log(newValue.id);
+            //   }
+            // }}
+
+            options={clients.map((client) => ({ id: client.id, label: `${client.kod} - ${client.nazwa1}` }))}
+            sx={{ width: '100%' }}
+            renderInput={(params) => <TextField {...params} label="Kontrahent" />}
+          />
+        </Grid>
+        <Grid item xs={1}>
+          <Button variant="outlined" size='large'
+            startIcon={<CreateIcon />}
+            sx={{ width: '100%' }}>
+            Edytuj
+          </Button>
+        </Grid>
+        <Grid item xs={1}>
+          <Button variant="outlined" size='large'
+            startIcon={<PersonAddIcon />}
+            sx={{ width: '100%' }}>
+            Dodaj
+          </Button>
+        </Grid>
+      </Grid>
+      <div style={{ height: 400, width: '100%', marginTop: '20' }}>
+        <TableContainer component={Paper} >
+          <Table sx={{ minWidth: 650 }} aria-label="simple table" >
+            <TableHead>
+              <TableRow>
+                <TableCell> </TableCell>
+                <TableCell>ID Typu</TableCell>
+                <TableCell>Nazwa</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                selectedClient?.kntInformacje.map((informacja) => (
+                  <TableRow
+                    key={informacja.kitId}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={informacja.wybrany}
+                      />
+                    </TableCell>
+                    <TableCell component="th" scope="row" width={100}>
+                      {informacja.kitId}
+                    </TableCell>
+                    <TableCell component="th" scope="row">
+                      <Button>{informacja.nazwa}</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     </Box>
   );

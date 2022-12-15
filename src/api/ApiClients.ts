@@ -1,6 +1,20 @@
 import Api from './ApiGlobal';
 import apiConfig from './ApiGlobal';
 
+export type ClientInformation = {
+  id: number,
+  kntId: number,
+  kitId: number,
+  nazwa: string,
+  opis: string,
+  archiwalny: boolean,
+  opeUtowrzyl: number,
+  dataUtworzenia: number,
+  opeModyfikowal: number,
+  dataModyfikacji: number,
+  wybrany: boolean
+}
+
 export type Client = {
     id: number, 
     typ: number, 
@@ -17,11 +31,17 @@ export type Client = {
     opeUtworzyl: number, 
     dataUtworzenia: number, 
     opeModyfikowal: number,
-    dataModyfikacji: number
+    dataModyfikacji: number,
+    kntInformacje: ClientInformation[]
 }
 
 
 export const getClients = () => {
   return Api.get('/clients', {
-    headers: { Authorization: `${localStorage.getItem('token')}` }});
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};
+
+export const getSelectedClient = (clientId: number) => {
+  return Api.get('/clients/'+clientId, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
