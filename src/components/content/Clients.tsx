@@ -91,12 +91,12 @@ export default function Clients() {
   useEffect(() => {
     getClients().then((res) => {
       setClients(res.data);
-    })
+    });
 
     getSelectedClient(2).then((res) => {
       setSelectedClient(res.data);
       console.log(res.data);
-    })
+    });
   }, []);
 
   const modificationToolTip = `Modyfikował: ${selectedClientInformation?.opeModyfikowal} \n
@@ -111,16 +111,14 @@ export default function Clients() {
     <Box sx={{ minWidth: 120 }}>
       <Grid container spacing={2}>
         <Grid item xs={10}>
-          <Autocomplete
+          <Autocomplete<{ id: number, label: string }>
             disablePortal
             autoHighlight
-            freeSolo
+            // freeSolo
             id="combo-box-demo"
-            // onChange={(newValue: string | { id: number; label: string; } | void) => {
-            //   if (typeof (newValue) !== "string" && newValue !== null) {
-            //     console.log(newValue.id);
-            //   }
-            // }}
+            onChange={(_event, value) => {
+              console.log(value);
+            }}
 
             options={clients.map((client) => ({ id: client.id, label: `${client.kod} - ${client.nazwa1}` }))}
             sx={{ width: '100%' }}
@@ -128,16 +126,16 @@ export default function Clients() {
           />
         </Grid>
         <Grid item xs={1}>
-          <Button variant="outlined" size='large'
-            startIcon={<CreateIcon />}
-            sx={{ width: '100%' }}>
+          <Button variant="outlined" size="large"
+                  startIcon={<CreateIcon />}
+                  sx={{ width: '100%' }}>
             Edytuj
           </Button>
         </Grid>
         <Grid item xs={1}>
-          <Button variant="outlined" size='large'
-            startIcon={<PersonAddIcon />}
-            sx={{ width: '100%' }}>
+          <Button variant="outlined" size="large"
+                  startIcon={<PersonAddIcon />}
+                  sx={{ width: '100%' }}>
             Dodaj
           </Button>
         </Grid>
@@ -145,8 +143,8 @@ export default function Clients() {
       <div style={{ height: 400, width: '100%', marginTop: '20' }}>
         <Grid container spacing={2}>
           <Grid item xs={7}>
-            <TableContainer component={Paper} >
-              <Table sx={{ minWidth: 650 }} aria-label="simple table" >
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
                     <TableCell> </TableCell>
@@ -228,6 +226,6 @@ export default function Clients() {
           </DialogActions>
         </Dialog>
       </div>
-    </Box >
+    </Box>
   );
 }
