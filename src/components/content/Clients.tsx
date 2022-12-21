@@ -18,19 +18,27 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import TablePagination from '@mui/material/TablePagination';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import Checkbox from '@mui/material/Checkbox';
 import { ClientInformation, getClients, getSelectedClient } from '../../api/ApiClients';
 import { useEffect } from 'react';
 import { Client } from '../../api/ApiClients';
+import Container from '@mui/material/Container';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableFooter from '@mui/material/TableFooter';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Paper from '@mui/material/Paper';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import { textAlign } from '@mui/system';
 
 // type Film = {
 //     label: string;
@@ -78,24 +86,50 @@ export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [selectedClientInformation, setSelectedClientInformation] = useState<ClientInformation>();
-  const [openClientInformationDialog, setOpenClientInformationDialog] = React.useState(false);
 
-  const handleClickOpenClientInformationDialog = () => {
-    setOpenClientInformationDialog(true);
+  const [editClientButtonDisabled, setEditClientButtonDisabled] = React.useState(true);
+  const [editInformationButtonDisabled, setEditInformationButtonDisabled] = React.useState(true);
+
+  const [openEditClientDialog, setOpenEditClientDialog] = React.useState(false);
+  const [openCreateClientDialog, setOpenCreateClientDialog] = React.useState(false);
+  const [openCreateClientInformationDialog, setOpenCreateClientInformationDialog] = React.useState(false);
+  const [openEditClientInformationDialog, setOpenEditClientInformationDialog] = React.useState(false);
+
+  const handleCloseEditClientDialog = () => {
+    setOpenEditClientDialog(false);
+  };
+  const handleCloseCreateClientDialog = () => {
+    setOpenCreateClientDialog(false);
+  };
+  const handleCloseAddClientInformationDialog = () => {
+    setOpenCreateClientInformationDialog(false);
+  };
+  const handleCloseEditClientInformationDialog = () => {
+    setOpenEditClientInformationDialog(false);
   };
 
-  const handleCloseClientInformationDialog = () => {
-    setOpenClientInformationDialog(false);
+  const handleCanUserEditClient = () => {
+    if (selectedClient !== null) {
+      setEditClientButtonDisabled(false);
+    }
+    else {
+      setEditClientButtonDisabled(true);
+    }
   };
+  const handleCanUserEditInformationButtonDisabled = () => {
+    if (selectedClientInformation !== null) {
+      setEditInformationButtonDisabled(false);
+    }
+    else {
+      setEditInformationButtonDisabled(true);
+    }
+  };
+
+
 
   useEffect(() => {
     getClients().then((res) => {
       setClients(res.data);
-    });
-
-    getSelectedClient(2).then((res) => {
-      setSelectedClient(res.data);
-      console.log(res.data);
     });
   }, []);
 
@@ -109,7 +143,7 @@ export default function Clients() {
 
   return (
     <Box sx={{ minWidth: 120 }}>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} mb={2}>
         <Grid item xs={10}>
           <Autocomplete<{ id: number, label: string }>
             disablePortal
@@ -117,9 +151,13 @@ export default function Clients() {
             // freeSolo
             id="combo-box-demo"
             onChange={(_event, value) => {
-              console.log(value);
+              if (value !== null) {
+                getSelectedClient(value.id).then((res) => {
+                  setSelectedClient(res.data);
+                  handleCanUserEditClient();
+                });
+              }
             }}
-
             options={clients.map((client) => ({ id: client.id, label: `${client.kod} - ${client.nazwa1}` }))}
             sx={{ width: '100%' }}
             renderInput={(params) => <TextField {...params} label="Kontrahent" />}
@@ -127,27 +165,60 @@ export default function Clients() {
         </Grid>
         <Grid item xs={1}>
           <Button variant="outlined" size="large"
-                  startIcon={<CreateIcon />}
-                  sx={{ width: '100%' }}>
+            startIcon={<CreateIcon />}
+            disabled={editClientButtonDisabled}
+            sx={{ width: '100%' }}
+            onClick={() => {
+              setOpenEditClientDialog(true);
+            }}>
             Edytuj
           </Button>
         </Grid>
         <Grid item xs={1}>
           <Button variant="outlined" size="large"
-                  startIcon={<PersonAddIcon />}
-                  sx={{ width: '100%' }}>
+            startIcon={<PersonAddIcon />}
+            sx={{ width: '100%' }}
+            onClick={() => {
+              setOpenCreateClientDialog(true);
+            }}>
             Dodaj
           </Button>
         </Grid>
       </Grid>
-      <div style={{ height: 400, width: '100%', marginTop: '20' }}>
+      <div style={{ height: 400, width: '100%', marginTop: '10' }}>
+
         <Grid container spacing={2}>
           <Grid item xs={7}>
+            <Box style={{ marginBottom: '10px', textAlign: 'left' }}>
+              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
+                startIcon={<PostAddIcon />}
+                onClick={() => {
+                  setOpenCreateClientInformationDialog(true);
+                }}>
+                Dodaj
+              </Button>
+              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
+                startIcon={<CreateIcon />}
+                disabled={editInformationButtonDisabled}
+                onClick={() => {
+                  setOpenEditClientInformationDialog(true);
+                }}>
+                Edytuj
+              </Button>
+              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
+                startIcon={<InventoryIcon />}
+                disabled={editClientButtonDisabled}
+                onClick={() => {
+
+                }}>
+                Pokaż archiwalne
+              </Button>
+            </Box>
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <Table sx={{ minWidth: 650 }} aria-label="simple table" id="table">
                 <TableHead>
                   <TableRow>
-                    <TableCell> </TableCell>
+                    {/* <TableCell> </TableCell> */}
                     <TableCell>Typ</TableCell>
                     <TableCell>Nazwa</TableCell>
                   </TableRow>
@@ -159,12 +230,12 @@ export default function Clients() {
                         key={informacja.kitId}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
-                        <TableCell padding="checkbox">
+                        {/* <TableCell padding="checkbox">
                           <Checkbox
                             color="primary"
                             checked={informacja.wybrany}
                           />
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell component="th" scope="row" width={100}>
                           {informacja.kitNazwa}
                         </TableCell>
@@ -173,14 +244,18 @@ export default function Clients() {
                             onClick={() => {
                               //handleClickOpenClientInformationDialog();
                               setSelectedClientInformation(informacja);
+                              handleCanUserEditInformationButtonDisabled();
                             }}
                           >{informacja.nazwa}</Button>
                         </TableCell>
                       </TableRow>
                     ))}
+
                 </TableBody>
               </Table>
             </TableContainer>
+
+
           </Grid>
           <Grid item xs={5}>
             <Card variant="outlined">
@@ -188,7 +263,7 @@ export default function Clients() {
                 <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
                   {selectedClientInformation?.nazwa}
                 </Typography>
-                <h5>{selectedClientInformation?.opis}</h5>
+                <h5 style={{ textAlign: 'left' }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
               </CardContent>
               <CardActions>
                 <Tooltip title={modificationToolTip}>
@@ -201,9 +276,10 @@ export default function Clients() {
           </Grid>
         </Grid>
 
+        {/*  Dodawanie klienta */}
         <Dialog
-          open={openClientInformationDialog}
-          onClose={handleCloseClientInformationDialog}
+          open={openCreateClientDialog}
+          onClose={handleCloseCreateClientDialog}
           fullScreen>
           <DialogTitle>Subscribe</DialogTitle>
           <DialogContent>
@@ -221,11 +297,89 @@ export default function Clients() {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseClientInformationDialog}>Zamknij</Button>
-            <Button onClick={handleCloseClientInformationDialog}>Zapisz</Button>
+            <Button onClick={handleCloseCreateClientDialog}>Zamknij</Button>
+            <Button onClick={handleCloseCreateClientDialog}>Zapisz</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/*  Edycja klienta */}
+        <Dialog
+          open={openEditClientDialog}
+          onClose={handleCloseEditClientDialog}
+          fullScreen>
+          <DialogTitle>Subscribe</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {selectedClientInformation?.nazwa}
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditClientDialog}>Zamknij</Button>
+            <Button onClick={handleCloseEditClientDialog}>Zapisz</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/*  Dodawanie informacji */}
+        <Dialog
+          open={openCreateClientInformationDialog}
+          onClose={handleCloseAddClientInformationDialog}
+          fullScreen>
+          <DialogTitle>Subscribe</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {selectedClientInformation?.nazwa}
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseAddClientInformationDialog}>Zamknij</Button>
+            <Button onClick={handleCloseAddClientInformationDialog}>Zapisz</Button>
+          </DialogActions>
+        </Dialog>
+
+        {/*  Edycja informacji */}
+        <Dialog
+          open={openEditClientInformationDialog}
+          onClose={handleCloseEditClientInformationDialog}
+          fullScreen>
+          <DialogTitle>Subscribe</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {selectedClientInformation?.nazwa}
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              label="Email Address"
+              type="email"
+              fullWidth
+              variant="standard"
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseEditClientInformationDialog}>Zamknij</Button>
+            <Button onClick={handleCloseEditClientInformationDialog}>Zapisz</Button>
           </DialogActions>
         </Dialog>
       </div>
-    </Box>
+    </Box >
   );
 }
