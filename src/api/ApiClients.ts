@@ -5,13 +5,14 @@ export type ClientInformation = {
   id: number,
   kntId: number,
   kitId: number,
+  kitNazwa: string,
   nazwa: string,
   opis: string,
   archiwalny: boolean,
-  opeUtowrzyl: number,
-  dataUtworzenia: number,
-  opeModyfikowal: number,
-  dataModyfikacji: number,
+  opeUtworzyl: string,
+  dataUtworzenia: Date,
+  opeModyfikowal: string,
+  dataModyfikacji: Date,
   wybrany: boolean
 }
 
@@ -28,10 +29,10 @@ export type Client = {
     poczta: string, 
     telefon: string, 
     email: string, 
-    opeUtworzyl: number, 
-    dataUtworzenia: number, 
-    opeModyfikowal: number,
-    dataModyfikacji: number,
+    opeUtworzyl: string, 
+    dataUtworzenia: Date, 
+    opeModyfikowal: string,
+    dataModyfikacji: Date,
     kntInformacje: ClientInformation[]
 }
 

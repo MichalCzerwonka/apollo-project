@@ -10,6 +10,8 @@ import ListItemText from '@mui/material/ListItemText';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { Link } from 'react-router-dom';
 
 const categories = [
@@ -71,6 +73,23 @@ export default function Navigator(props: DrawerProps) {
                 </ListItem>
               </Link>
             ))}
+            <a href='http://192.168.13.8:81/wordpress/' target='_blank'>
+              <ListItem disablePadding key='Baza wiedzy'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><MenuBookIcon /></ListItemIcon>
+                  <ListItemText>→ Baza wiedzy</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
+            <a href='http://192.168.13.8' target='_blank'>
+              <ListItem disablePadding key='Baza wiedzy'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><GitHubIcon /></ListItemIcon>
+                  <ListItemText>→ Gitlab</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
+
             <Divider sx={{ mt: 2 }} />
           </Box>
         ))}
