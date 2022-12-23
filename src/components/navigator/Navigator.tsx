@@ -12,13 +12,14 @@ import PeopleIcon from '@mui/icons-material/People';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GitHubIcon from '@mui/icons-material/GitHub';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
 import { Link } from 'react-router-dom';
 
 const categories = [
   {
     id: 'Wstążka',
     children: [
-      { id: 'Klienci', icon: <PeopleIcon />, active: false, path: '/clients' },
+      { id: 'Klienci', icon: <ContactMailIcon />, active: false, path: '/clients' },
     ],
   },
 ];
@@ -73,7 +74,7 @@ export default function Navigator(props: DrawerProps) {
                 </ListItem>
               </Link>
             ))}
-            <a href='http://192.168.13.8:81/wordpress/' target='_blank'>
+            <a href='http://192.168.13.8:81/wordpress/' target='_blank' rel="noreferrer">
               <ListItem disablePadding key='Baza wiedzy'>
                 <ListItemButton sx={item}>
                   <ListItemIcon><MenuBookIcon /></ListItemIcon>
@@ -81,11 +82,27 @@ export default function Navigator(props: DrawerProps) {
                 </ListItemButton>
               </ListItem>
             </a>
-            <a href='http://192.168.13.8' target='_blank'>
+            <a href='http://192.168.13.8' target='_blank' rel="noreferrer">
               <ListItem disablePadding key='Baza wiedzy'>
                 <ListItemButton sx={item}>
                   <ListItemIcon><GitHubIcon /></ListItemIcon>
                   <ListItemText>→ Gitlab</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
+            <a href='http://192.168.13.14:82' target='_blank' rel="noreferrer">
+              <ListItem disablePadding key='HRM Spółka'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><PeopleIcon /></ListItemIcon>
+                  <ListItemText>→ HRM Spółka</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
+            <a href='http://192.168.13.14:81' target='_blank' rel="noreferrer">
+              <ListItem disablePadding key='HRM Adam Czerwonka'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><PeopleIcon /></ListItemIcon>
+                  <ListItemText>→ HRM Adam Czerwonka</ListItemText>
                 </ListItemButton>
               </ListItem>
             </a>

@@ -1,6 +1,11 @@
 import Api from './ApiGlobal';
 import apiConfig from './ApiGlobal';
 
+export type ClientInformationType = {
+  id: number,
+  kod: string
+}
+
 export type ClientInformation = {
   id: number,
   kntId: number,
@@ -41,8 +46,17 @@ export const getClients = () => {
   return Api.get('/clients', {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
+export const getClientInformationTypes = () => {
+  return Api.get('/informationtype', {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};
 
 export const getSelectedClient = (clientId: number) => {
   return Api.get('/clients/'+clientId, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};
+
+export const postNewClient = (data: Client) => {
+  return Api.post('/clients/add', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
