@@ -14,6 +14,8 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface ClientAddEditFormProps {
     onClose: () => void,
@@ -22,7 +24,7 @@ interface ClientAddEditFormProps {
 
 const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }) => {
     const isEdit = !!client;
-
+    let navigate = useNavigate();
 
     const addClientSchema = yup.object().shape({
         kod: yup.string().required(),
@@ -48,6 +50,10 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         if (isEdit) {
             putEditClient(data)
                 .catch((error: any) => {
+                    if (error.response.status === 401) {
+                        localStorage.clear();
+                        navigate('/login');
+                    }
                     setErrorMessage(error.response.data.message);
                     setOpenSnackbar(true);
                 });
@@ -55,6 +61,10 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         else {
             postNewClient(data)
                 .catch((error: any) => {
+                    if (error.response.status === 401) {
+                        localStorage.clear();
+                        navigate('/login');
+                    }
                     setErrorMessage(error.response.data.message);
                     setOpenSnackbar(true);
                 });
@@ -144,6 +154,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
 
         <Snackbar
             open={openSnackbar}
+            autoHideDuration={6000}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             onClose={handleCloseSnackbar}
         >

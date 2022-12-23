@@ -47,6 +47,9 @@ import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import ClientAddEditForm from './forms/ClientAddEditForm';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import InformationAddEditForm from './forms/InformationAddEditForm';
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -61,19 +64,19 @@ export default function Clients() {
   const [editInformationButtonDisabled, setEditInformationButtonDisabled] = React.useState(true);
 
   const [isEditClient, setIsEditClient] = useState(false);
+  const [isEditClientInformation, setIsEditClientInformation] = useState(false);
   const [openAddEditClientDialog, setOpenAddEditClientDialog] = React.useState(false);
-  const [openCreateClientInformationDialog, setOpenCreateClientInformationDialog] = React.useState(false);
-  const [openEditClientInformationDialog, setOpenEditClientInformationDialog] = React.useState(false);
+  const [openAddEditClientInformationDialog, setOpenAddEditClientInformationDialog] = React.useState(false);
+
+  let navigate = useNavigate();
 
   const handleCloseCreateEditClientDialog = () => {
     setOpenAddEditClientDialog(false);
     setIsEditClient(false);
   };
-  const handleCloseAddClientInformationDialog = () => {
-    setOpenCreateClientInformationDialog(false);
-  };
-  const handleCloseEditClientInformationDialog = () => {
-    setOpenEditClientInformationDialog(false);
+  const handleCloseAddEditClientInformationDialog = () => {
+    setOpenAddEditClientInformationDialog(false);
+    setIsEditClientInformation(false);
   };
 
   const handleCanUserEditClient = () => {
@@ -115,7 +118,13 @@ export default function Clients() {
   const addClientSubmitHandler: SubmitHandler<Client> = (data: Client) => {
     postNewClient(data)
       .catch((error: any) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate('/login');
+        }
         console.log(error);
+        setErrorMessage(error.response.data.message);
+        setOpenSnackbar(true);
       });
   }
   const addClientInformationSubmitHandler: SubmitHandler<ClientInformation> = (data: ClientInformation) => {
@@ -153,6 +162,10 @@ export default function Clients() {
       setClients(res.data);
     })
       .catch((error) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate('/login');
+        }
         setErrorMessage(error.response.data.message);
         setOpenSnackbar(true);
       });
@@ -161,6 +174,10 @@ export default function Clients() {
       setClientInformationTypes(res.data);
     })
       .catch((error) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate('/login');
+        }
         setErrorMessage(error.response.data.message);
         setOpenSnackbar(true);
       });
@@ -181,7 +198,6 @@ export default function Clients() {
           <Autocomplete<{ id: number, label: string }>
             disablePortal
             autoHighlight
-            // freeSolo
             id="combo-box-demo"
             onChange={(_event, value) => {
               if (value !== null) {
@@ -189,6 +205,10 @@ export default function Clients() {
                   setSelectedClient(res.data);
                   handleCanUserEditClient();
                 }).catch((error) => {
+                  if (error.response.status === 401) {
+                    localStorage.clear();
+                    navigate('/login');
+                  }
                   setErrorMessage(error.response.data.message);
                   setOpenSnackbar(true);
                 });
@@ -230,7 +250,7 @@ export default function Clients() {
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
                 startIcon={<PostAddIcon />}
                 onClick={() => {
-                  setOpenCreateClientInformationDialog(true);
+                  setOpenAddEditClientInformationDialog(true);
                 }}>
                 Dodaj
               </Button>
@@ -238,7 +258,7 @@ export default function Clients() {
                 startIcon={<CreateIcon />}
                 disabled={editInformationButtonDisabled}
                 onClick={() => {
-                  setOpenEditClientInformationDialog(true);
+                  setOpenAddEditClientInformationDialog(true);
                 }}>
                 Edytuj
               </Button>
@@ -267,20 +287,14 @@ export default function Clients() {
                         key={informacja.kitId}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
-                        {/* <TableCell padding="checkbox">
-                          <Checkbox
-                            color="primary"
-                            checked={informacja.wybrany}
-                          />
-                        </TableCell> */}
                         <TableCell component="th" scope="row" width={100}>
                           {informacja.kitNazwa}
                         </TableCell>
                         <TableCell component="th" scope="row">
                           <Button
                             onClick={() => {
-                              //handleClickOpenClientInformationDialog();
                               setSelectedClientInformation(informacja);
+                              setIsEditClientInformation(true);
                               handleCanUserEditInformationButtonDisabled();
                             }}
                           >{informacja.nazwa}</Button>
@@ -313,114 +327,26 @@ export default function Clients() {
           </Grid>
         </Grid>
 
-        {/*  Dodawanie klienta */}
+        {/*  Dodawanie / edycja klienta */}
         <Dialog
           open={openAddEditClientDialog}
           onClose={handleCloseCreateEditClientDialog}
           fullScreen>
-          <DialogTitle>Klient</DialogTitle>
           <DialogContent>
             <ClientAddEditForm onClose={handleCloseCreateEditClientDialog} client={isEditClient ? selectedClient : undefined} />
           </DialogContent>
         </Dialog>
 
-        {/* Edycja klienta
+        {/*  Dodawanie / edycja informacji */}
         <Dialog
-          open={openEditClientDialog}
-          onClose={handleCloseEditClientDialog}
+          open={openAddEditClientInformationDialog}
+          onClose={handleCloseAddEditClientInformationDialog}
           fullScreen>
           <DialogContent>
-                
-          </DialogContent>
-        </Dialog> */}
-
-        {/*  Dodawanie informacji */}
-        <Dialog
-          open={openCreateClientInformationDialog}
-          onClose={handleCloseAddClientInformationDialog}
-          fullScreen>
-          <DialogTitle>Nowa informacja</DialogTitle>
-          <DialogContent>
-            <form onSubmit={handleSubmitInformation(addClientInformationSubmitHandler)}>
-              <br />
-              <Controller name="kntId" control={controlInformation} render={({ field }) => (<Autocomplete<{ id: number, label: string }>
-                autoHighlight
-                id="combo-box-demo"
-                onChange={(_event, value) => {
-                  if (value !== null) {
-                    field.onChange(value.id)
-                  };
-                }
-                }
-                options={clients.map((client) => ({ id: client.id, label: client.kod }))}
-                sx={{ width: '100%' }}
-                renderInput={(params) => <TextField {...params} label="Kontrahent" />}
-              />)} />
-              <br />
-              <Controller name="kitId" control={controlInformation} render={({ field }) => (<Autocomplete<{ id: number, label: string }>
-                autoHighlight
-                id="combo-box-demo"
-                onChange={(_event, value) => {
-                  if (value !== null) {
-                    field.onChange(value.id)
-                  };
-                }
-                }
-                options={clientInformationTypes.map((informationType) => ({ id: informationType.id, label: informationType.kod }))}
-                sx={{ width: '100%' }}
-                renderInput={(params) => <TextField {...params} label="Typ informacji" />}
-              />)} />
-              <br />
-              <Controller name="nazwa" control={controlInformation} render={({ field }) => (
-                <TextField {...field} label="Nazwa" variant="outlined" error={!!errorsInformation.nazwa}
-                  helperText={errorsInformation.nazwa ? errorsInformation.nazwa?.message : ''} />
-              )} />
-              <br />
-              {errorsInformation.nazwa && errorsInformation.nazwa?.message && <span>{errorsInformation.nazwa.message}</span>}
-              <br />
-              <Controller name="opis" control={controlInformation} render={({ field }) => (
-                <TextField {...field} fullWidth label="Opis" variant="outlined" error={!!errorsInformation.opis}
-                  helperText={errorsInformation.opis ? errorsInformation.opis?.message : ''} />
-              )} />
-              <br />
-              {errorsInformation.opis && errorsInformation.opis?.message && <span>{errorsInformation.opis.message}</span>}
-              <br />
-              <br />
-              <Button onClick={handleCloseAddClientInformationDialog}
-                variant="contained"
-                endIcon={<BlockIcon />}>Anuluj</Button>
-              <Button onClick={handleSubmitInformation(addClientInformationSubmitHandler)}
-                variant="contained"
-                endIcon={<PersonAddIcon />}>Dodaj</Button>
-            </form>
+            <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog} clientInformation={isEditClientInformation ? selectedClientInformation : undefined} clients={clients} clientInformationTypes={clientInformationTypes} />
           </DialogContent>
         </Dialog>
 
-        {/*  Edycja informacji */}
-        <Dialog
-          open={openEditClientInformationDialog}
-          onClose={handleCloseEditClientInformationDialog}
-          fullScreen>
-          <DialogTitle>Subscribe</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {selectedClientInformation?.nazwa}
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Email Address"
-              type="email"
-              fullWidth
-              variant="standard"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseEditClientInformationDialog}>Zamknij</Button>
-            <Button onClick={handleCloseEditClientInformationDialog}>Zapisz</Button>
-          </DialogActions>
-        </Dialog>
       </div>
       <Snackbar
         open={openSnackbar}

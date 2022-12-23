@@ -14,6 +14,8 @@ import Divider from '@mui/material/Divider';
 import { getWeather } from '../../api/ApiWeather';
 import { DanePogodowe } from '../../api/ApiWeather';
 import { useState, useEffect } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
     onDrawerToggle: () => void;
@@ -26,6 +28,7 @@ export default function Header(props: HeaderProps) {
     const current = new Date();
     const date = `${current.getDate()}.${current.getMonth() + 1}.${current.getFullYear()}`;
 
+    let navigate = useNavigate();
     const { onDrawerToggle } = props;
 
     const { logout } = useAuthenticatedUser();
@@ -35,6 +38,10 @@ export default function Header(props: HeaderProps) {
             setCurrentTemperature(res.data);
         })
             .catch((error: any) => {
+                if (error.response.status === 401) {
+                    localStorage.clear();
+                    navigate('/login');
+                }
                 console.log(error);
             })
     }, []);

@@ -10,8 +10,11 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function MainSite() {
+    let navigate = useNavigate();
     return (
         <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
             <AppBar

@@ -14,6 +14,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import { Link } from 'react-router-dom';
+import UnfoldMoreDoubleIcon from '@mui/icons-material/UnfoldMoreDouble';
 
 const categories = [
   {
@@ -90,6 +91,14 @@ export default function Navigator(props: DrawerProps) {
                 </ListItemButton>
               </ListItem>
             </a>
+            <a href='https://arcussoft.atlassian.net/jira/dashboards/last-visited' target='_blank' rel="noreferrer">
+              <ListItem disablePadding key='Jira'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><UnfoldMoreDoubleIcon /></ListItemIcon>
+                  <ListItemText>→ Jira</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
             <a href='http://192.168.13.14:82' target='_blank' rel="noreferrer">
               <ListItem disablePadding key='HRM Spółka'>
                 <ListItemButton sx={item}>
@@ -106,6 +115,7 @@ export default function Navigator(props: DrawerProps) {
                 </ListItemButton>
               </ListItem>
             </a>
+
 
             <Divider sx={{ mt: 2 }} />
           </Box>
