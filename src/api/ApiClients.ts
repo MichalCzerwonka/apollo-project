@@ -60,3 +60,8 @@ export const postNewClient = (data: Client) => {
   return Api.post('/clients/add', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
+
+export const putEditClient = (data: Client) => {
+  return Api.put('/clients/edit', data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};

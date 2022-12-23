@@ -21,6 +21,10 @@ import Tooltip from '@mui/material/Tooltip';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import BlockIcon from '@mui/icons-material/Block';
+import Alert, { AlertProps } from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import CloseIcon from '@mui/icons-material/Close';
+import Snackbar from '@mui/material/Snackbar';
 
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { ClientInformation, ClientInformationType, getClientInformationTypes, getClients, getSelectedClient, postNewClient } from '../../api/ApiClients';
@@ -42,6 +46,7 @@ import * as yup from 'yup';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import ClientAddEditForm from './forms/ClientAddEditForm';
 
 export default function Clients() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -55,16 +60,14 @@ export default function Clients() {
   const [editClientButtonDisabled, setEditClientButtonDisabled] = React.useState(true);
   const [editInformationButtonDisabled, setEditInformationButtonDisabled] = React.useState(true);
 
-  const [openEditClientDialog, setOpenEditClientDialog] = React.useState(false);
-  const [openCreateClientDialog, setOpenCreateClientDialog] = React.useState(false);
+  const [isEditClient, setIsEditClient] = useState(false);
+  const [openAddEditClientDialog, setOpenAddEditClientDialog] = React.useState(false);
   const [openCreateClientInformationDialog, setOpenCreateClientInformationDialog] = React.useState(false);
   const [openEditClientInformationDialog, setOpenEditClientInformationDialog] = React.useState(false);
 
-  const handleCloseEditClientDialog = () => {
-    setOpenEditClientDialog(false);
-  };
-  const handleCloseCreateClientDialog = () => {
-    setOpenCreateClientDialog(false);
+  const handleCloseCreateEditClientDialog = () => {
+    setOpenAddEditClientDialog(false);
+    setIsEditClient(false);
   };
   const handleCloseAddClientInformationDialog = () => {
     setOpenCreateClientInformationDialog(false);
@@ -90,19 +93,6 @@ export default function Clients() {
     }
   };
 
-  const addClientSchema = yup.object().shape({
-    kod: yup.string().required(),
-    nazwa1: yup.string().required(),
-    nazwa2: yup.string(),
-    miasto: yup.string().required(),
-    nip: yup.string().required(),
-    ulica: yup.string().required(),
-    kodPocztowy: yup.string().required(),
-    poczta: yup.string().required(),
-    telefon: yup.string().required(),
-    email: yup.string().email()
-  })
-
   const addClientInformationSchema = yup.object().shape({
     kntId: yup.number().required(),
     kitId: yup.number().required(),
@@ -112,7 +102,13 @@ export default function Clients() {
     archiwalny: yup.string(),
   })
 
-  const { control, register, handleSubmit, watch, reset, formState: { errors } } = useForm<Client>({ resolver: yupResolver(addClientSchema) });
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+  }
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { control: controlInformation, register: registerInformation, handleSubmit: handleSubmitInformation, watch: watchInformation, reset: resetInformation, formState: { errors: errorsInformation } } = useForm<ClientInformation>({ resolver: yupResolver(addClientInformationSchema) });
 
@@ -130,16 +126,44 @@ export default function Clients() {
     setSelectedInformationClient(event.target.value as unknown as number);
     console.log(selectedInformationClient);
   };
-
+  // const ControlledAutocomplete = ({ options = [], renderInput, getOptionLabel, onChange: ignored, control, defaultValue, name, renderOption }) => {
+  //   return (
+  //     <Controller
+  //       render={({ onChange, ...props }) => (
+  //         <Autocomplete
+  //           options={options}
+  //           getOptionLabel={getOptionLabel}
+  //           renderOption={renderOption}
+  //           renderInput={renderInput}
+  //           onChange={(e, data) => onChange(data)}
+  //           {...props}
+  //         />
+  //       )}
+  //       onChange={([, data]) => data}
+  //       defaultValue={defaultValue}
+  //       name={name}
+  //       control={control}
+  //     />
+  //   );
+  // }
 
 
   useEffect(() => {
     getClients().then((res) => {
       setClients(res.data);
-    });
+    })
+      .catch((error) => {
+        setErrorMessage(error.response.data.message);
+        setOpenSnackbar(true);
+      });
+
     getClientInformationTypes().then((res) => {
       setClientInformationTypes(res.data);
-    });
+    })
+      .catch((error) => {
+        setErrorMessage(error.response.data.message);
+        setOpenSnackbar(true);
+      });
   }, []);
 
   const modificationToolTip = `Modyfikował: ${selectedClientInformation?.opeModyfikowal} \n
@@ -164,6 +188,9 @@ export default function Clients() {
                 getSelectedClient(value.id).then((res) => {
                   setSelectedClient(res.data);
                   handleCanUserEditClient();
+                }).catch((error) => {
+                  setErrorMessage(error.response.data.message);
+                  setOpenSnackbar(true);
                 });
               }
             }}
@@ -178,7 +205,8 @@ export default function Clients() {
             disabled={editClientButtonDisabled}
             sx={{ width: '100%' }}
             onClick={() => {
-              setOpenEditClientDialog(true);
+              setOpenAddEditClientDialog(true);
+              setIsEditClient(true);
             }}>
             Edytuj
           </Button>
@@ -188,7 +216,7 @@ export default function Clients() {
             startIcon={<PersonAddIcon />}
             sx={{ width: '100%' }}
             onClick={() => {
-              setOpenCreateClientDialog(true);
+              setOpenAddEditClientDialog(true);
             }}>
             Dodaj
           </Button>
@@ -287,116 +315,24 @@ export default function Clients() {
 
         {/*  Dodawanie klienta */}
         <Dialog
-          open={openCreateClientDialog}
-          onClose={handleCloseCreateClientDialog}
+          open={openAddEditClientDialog}
+          onClose={handleCloseCreateEditClientDialog}
           fullScreen>
-          <DialogTitle>Nowy klient</DialogTitle>
+          <DialogTitle>Klient</DialogTitle>
           <DialogContent>
-            <form onSubmit={handleSubmit(addClientSubmitHandler)}>
-              <br />
-              <Controller name="kod" control={control} render={({ field }) => (
-                <TextField {...field} label="Kod" variant="outlined" error={!!errors.kod}
-                  helperText={errors.kod ? errors.kod?.message : ''} />
-              )} />
-              <br />
-              {errors.kod && errors.kod?.message && <span>{errors.kod.message}</span>}
-              <br />
-              <Controller name="nazwa1" control={control} render={({ field }) => (
-                <TextField {...field} label="Nazwa1" variant="outlined" error={!!errors.nazwa1}
-                  helperText={errors.nazwa1 ? errors.nazwa1?.message : ''} />
-              )} />
-              <br />
-              {errors.nazwa1 && errors.nazwa1?.message && <span>{errors.nazwa1.message}</span>}
-              <br />
-              <Controller name="nazwa2" control={control} render={({ field }) => (
-                <TextField {...field} label="Nazwa2" variant="outlined" error={!!errors.nazwa2}
-                  helperText={errors.nazwa2 ? errors.nazwa2?.message : ''} />
-              )} />
-              <br />
-              <br />
-              <Controller name="miasto" control={control} render={({ field }) => (
-                <TextField {...field} label="Miasto" variant="outlined" error={!!errors.miasto}
-                  helperText={errors.miasto ? errors.miasto?.message : ''} />
-              )} />
-              <br />
-              {errors.miasto && errors.miasto?.message && <span>{errors.miasto.message}</span>}
-              <br />
-              <Controller name="nip" control={control} render={({ field }) => (
-                <TextField {...field} label="NIP" variant="outlined" error={!!errors.nip}
-                  helperText={errors.nip ? errors.nip?.message : ''} />
-              )} />
-              <br />
-              {errors.nip && errors.nip?.message && <span>{errors.nip.message}</span>}
-              <br />
-              <Controller name="ulica" control={control} render={({ field }) => (
-                <TextField {...field} label="Ulica" variant="outlined" error={!!errors.ulica}
-                  helperText={errors.ulica ? errors.ulica?.message : ''} />
-              )} />
-              <br />
-              {errors.ulica && errors.ulica?.message && <span>{errors.ulica.message}</span>}
-              <br />
-              <Controller name="kodPocztowy" control={control} render={({ field }) => (
-                <TextField {...field} label="Kod pocztowy" variant="outlined" error={!!errors.kodPocztowy}
-                  helperText={errors.kodPocztowy ? errors.kodPocztowy?.message : ''} />
-              )} />
-              <br />
-              {errors.kodPocztowy && errors.kodPocztowy?.message && <span>{errors.kodPocztowy.message}</span>}
-              <br />
-              <Controller name="poczta" control={control} render={({ field }) => (
-                <TextField {...field} label="Poczta" variant="outlined" error={!!errors.poczta}
-                  helperText={errors.poczta ? errors.poczta?.message : ''} />
-              )} />
-              <br />
-              {errors.poczta && errors.poczta?.message && <span>{errors.poczta.message}</span>}
-              <br />
-              <Controller name="telefon" control={control} render={({ field }) => (
-                <TextField {...field} label="Telefon" variant="outlined" error={!!errors.telefon}
-                  helperText={errors.telefon ? errors.telefon?.message : ''} />
-              )} />
-              <br />
-              {errors.telefon && errors.telefon?.message && <span>{errors.telefon.message}</span>}
-              <br />
-              <Controller name="email" control={control} render={({ field }) => (
-                <TextField {...field} type="email" label="Email" variant="outlined" error={!!errors.email}
-                  helperText={errors.email ? errors.email?.message : ''} />
-              )} />
-              <br />
-              <br />
-              <Button onClick={handleCloseCreateClientDialog}
-                variant="contained"
-                endIcon={<BlockIcon />}>Anuluj</Button>
-              <Button onClick={handleSubmit(addClientSubmitHandler)}
-                variant="contained"
-                endIcon={<PersonAddIcon />}>Dodaj</Button>
-            </form>
+            <ClientAddEditForm onClose={handleCloseCreateEditClientDialog} client={isEditClient ? selectedClient : undefined} />
           </DialogContent>
         </Dialog>
 
-        {/*  Edycja klienta */}
+        {/* Edycja klienta
         <Dialog
           open={openEditClientDialog}
           onClose={handleCloseEditClientDialog}
           fullScreen>
-          <DialogTitle>Subscribe</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              {selectedClientInformation?.nazwa}
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              label="Email Address"
-              type="email"
-              fullWidth
-              variant="standard"
-            />
+                
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseEditClientDialog}>Zamknij</Button>
-            <Button onClick={handleCloseEditClientDialog}>Zapisz</Button>
-          </DialogActions>
-        </Dialog>
+        </Dialog> */}
 
         {/*  Dodawanie informacji */}
         <Dialog
@@ -412,6 +348,7 @@ export default function Clients() {
                 id="combo-box-demo"
                 onChange={(_event, value) => {
                   if (value !== null) {
+                    field.onChange(value.id)
                   };
                 }
                 }
@@ -425,6 +362,7 @@ export default function Clients() {
                 id="combo-box-demo"
                 onChange={(_event, value) => {
                   if (value !== null) {
+                    field.onChange(value.id)
                   };
                 }
                 }
@@ -484,6 +422,31 @@ export default function Clients() {
           </DialogActions>
         </Dialog>
       </div>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert severity="error"
+          sx={{ width: '100%' }}
+
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setOpenSnackbar(false);
+              }}
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }>
+          <AlertTitle>Wystąpił błąd</AlertTitle>
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </Box >
   );
 }
