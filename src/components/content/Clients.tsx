@@ -8,10 +8,7 @@ import Button from '@mui/material/Button';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import CreateIcon from '@mui/icons-material/Create';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -20,14 +17,11 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import BlockIcon from '@mui/icons-material/Block';
 import Alert, { AlertProps } from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import CloseIcon from '@mui/icons-material/Close';
 import Snackbar from '@mui/material/Snackbar';
-
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { ClientInformation, ClientInformationType, getClientInformationTypes, getClients, getSelectedClient, postNewClient } from '../../api/ApiClients';
+import { ClientInformation, ClientInformationType, getClientInformationTypes, getClients, getSelectedClient } from '../../api/ApiClients';
 import { useEffect } from 'react';
 import { Client } from '../../api/ApiClients';
 import Table from '@mui/material/Table';
@@ -38,14 +32,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import { textAlign } from '@mui/system';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import ClientAddEditForm from './forms/ClientAddEditForm';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -57,8 +43,6 @@ export default function Clients() {
   const [selectedClientInformation, setSelectedClientInformation] = useState<ClientInformation>();
 
   const [clientInformationTypes, setClientInformationTypes] = useState<ClientInformationType[]>([]);
-  const [selectedClientInformationType, setSelectedClientInformationType] = useState<ClientInformationType>();
-
 
   const [editClientButtonDisabled, setEditClientButtonDisabled] = React.useState(true);
   const [editInformationButtonDisabled, setEditInformationButtonDisabled] = React.useState(true);
@@ -96,15 +80,6 @@ export default function Clients() {
     }
   };
 
-  const addClientInformationSchema = yup.object().shape({
-    kntId: yup.number().required(),
-    kitId: yup.number().required(),
-    kitNazwa: yup.string().required(),
-    nazwa: yup.string().required(),
-    opis: yup.string().required(),
-    archiwalny: yup.string(),
-  })
-
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
   const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -112,50 +87,6 @@ export default function Clients() {
     }
   }
   const [errorMessage, setErrorMessage] = useState("");
-
-  const { control: controlInformation, register: registerInformation, handleSubmit: handleSubmitInformation, watch: watchInformation, reset: resetInformation, formState: { errors: errorsInformation } } = useForm<ClientInformation>({ resolver: yupResolver(addClientInformationSchema) });
-
-  const addClientSubmitHandler: SubmitHandler<Client> = (data: Client) => {
-    postNewClient(data)
-      .catch((error: any) => {
-        if (error.response.status === 401) {
-          localStorage.clear();
-          navigate('/login');
-        }
-        console.log(error);
-        setErrorMessage(error.response.data.message);
-        setOpenSnackbar(true);
-      });
-  }
-  const addClientInformationSubmitHandler: SubmitHandler<ClientInformation> = (data: ClientInformation) => {
-    console.log(data);
-  }
-  const [selectedInformationClient, setSelectedInformationClient] = React.useState<number>();
-  const handleInformationClientChange = (event: SelectChangeEvent) => {
-    setSelectedInformationClient(event.target.value as unknown as number);
-    console.log(selectedInformationClient);
-  };
-  // const ControlledAutocomplete = ({ options = [], renderInput, getOptionLabel, onChange: ignored, control, defaultValue, name, renderOption }) => {
-  //   return (
-  //     <Controller
-  //       render={({ onChange, ...props }) => (
-  //         <Autocomplete
-  //           options={options}
-  //           getOptionLabel={getOptionLabel}
-  //           renderOption={renderOption}
-  //           renderInput={renderInput}
-  //           onChange={(e, data) => onChange(data)}
-  //           {...props}
-  //         />
-  //       )}
-  //       onChange={([, data]) => data}
-  //       defaultValue={defaultValue}
-  //       name={name}
-  //       control={control}
-  //     />
-  //   );
-  // }
-
 
   useEffect(() => {
     getClients().then((res) => {
@@ -185,11 +116,6 @@ export default function Clients() {
 
   const modificationToolTip = `Modyfikował: ${selectedClientInformation?.opeModyfikowal} \n
   Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`;
-
-  // const informationTableDef: GridColDef[] = [
-  //   { field: 'kitId', headerName: 'ID typu', width: 100, sortable: true, },
-  //   { field: 'nazwa', headerName: 'Nazwa', width: 130, sortable: true, },
-  // ];
 
   return (
     <Box sx={{ minWidth: 120 }}>
@@ -275,7 +201,6 @@ export default function Clients() {
               <Table sx={{ minWidth: 650 }} aria-label="simple table" id="table">
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell> </TableCell> */}
                     <TableCell>Typ</TableCell>
                     <TableCell>Nazwa</TableCell>
                   </TableRow>
@@ -305,8 +230,6 @@ export default function Clients() {
                 </TableBody>
               </Table>
             </TableContainer>
-
-
           </Grid>
           <Grid item xs={5} >
             <Card variant="outlined" >
@@ -326,7 +249,6 @@ export default function Clients() {
             </Card>
           </Grid>
         </Grid>
-
         {/*  Dodawanie / edycja klienta */}
         <Dialog
           open={openAddEditClientDialog}
@@ -336,7 +258,6 @@ export default function Clients() {
             <ClientAddEditForm onClose={handleCloseCreateEditClientDialog} client={isEditClient ? selectedClient : undefined} />
           </DialogContent>
         </Dialog>
-
         {/*  Dodawanie / edycja informacji */}
         <Dialog
           open={openAddEditClientInformationDialog}
@@ -346,7 +267,6 @@ export default function Clients() {
             <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog} clientInformation={isEditClientInformation ? selectedClientInformation : undefined} clients={clients} clientInformationTypes={clientInformationTypes} />
           </DialogContent>
         </Dialog>
-
       </div>
       <Snackbar
         open={openSnackbar}
