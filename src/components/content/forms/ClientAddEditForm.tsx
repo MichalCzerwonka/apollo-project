@@ -16,6 +16,7 @@ import Stack from '@mui/material/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import SnackbarHOC from '../../SnackbarHOC';
 
 interface ClientAddEditFormProps {
     onClose: () => void,
@@ -38,6 +39,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         telefon: yup.string().required(),
         email: yup.string().email()
     })
+
 
     const [openSnackbar, setOpenSnackbar] = React.useState(false);
     const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
