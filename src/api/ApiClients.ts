@@ -56,12 +56,21 @@ export const getSelectedClient = (clientId: number) => {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
 
+
 export const postNewClient = (data: Client) => {
   return Api.post('/clients/add', data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};
+export const postNewClientInformation = (data: ClientInformation) => {
+  return Api.post('/information/add', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
 
 export const putEditClient = (data: Client) => {
   return Api.put('/clients/edit', data, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+};
+export const putEditClientInformation = (data: ClientInformation) => {
+  return Api.put('/information/edit', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };

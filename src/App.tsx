@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PrivateRoute } from './components/routing/PrivateRoute';
 import Clients from './components/content/Clients';
 import MainSite from './components/content/MainSite';
+import { SnackbarProvider } from "notistack";
 
 export let theme = createTheme({
   palette: {
@@ -155,28 +156,31 @@ theme = {
 
 function App() {
   return (
-    <div className="App">
-      <ThemeProvider theme={theme}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>}
-            >
-              <Route path="/" element={<MainSite />} />
-              <Route path="/clients" element={<Clients />} />
-            </Route>
-            <Route path="/login" element={<SignIn />} />
-            <Route path="/*" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </div>
+    <SnackbarProvider>
+      <div className="App">
+        <ThemeProvider theme={theme}>
+
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>}
+              >
+                <Route path="/" element={<MainSite />} />
+                <Route path="/clients" element={<Clients />} />
+              </Route>
+              <Route path="/login" element={<SignIn />} />
+              <Route path="/*" element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              } />
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
+      </div>
+    </SnackbarProvider>
   );
 }
 

@@ -163,6 +163,7 @@ export default function Clients() {
             sx={{ width: '100%' }}
             onClick={() => {
               setOpenAddEditClientDialog(true);
+
             }}>
             Dodaj
           </Button>
@@ -176,6 +177,7 @@ export default function Clients() {
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
                 startIcon={<PostAddIcon />}
                 onClick={() => {
+                  setIsEditClientInformation(false);
                   setOpenAddEditClientInformationDialog(true);
                 }}>
                 Dodaj
@@ -184,6 +186,7 @@ export default function Clients() {
                 startIcon={<CreateIcon />}
                 disabled={editInformationButtonDisabled}
                 onClick={() => {
+                  setIsEditClientInformation(true);
                   setOpenAddEditClientInformationDialog(true);
                 }}>
                 Edytuj
@@ -219,7 +222,6 @@ export default function Clients() {
                           <Button
                             onClick={() => {
                               setSelectedClientInformation(informacja);
-                              setIsEditClientInformation(true);
                               handleCanUserEditInformationButtonDisabled();
                             }}
                           >{informacja.nazwa}</Button>
@@ -264,7 +266,9 @@ export default function Clients() {
           onClose={handleCloseAddEditClientInformationDialog}
           fullScreen>
           <DialogContent>
-            <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog} clientInformation={isEditClientInformation ? selectedClientInformation : undefined} clients={clients} clientInformationTypes={clientInformationTypes} />
+            <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog}
+              clientInformation={isEditClientInformation ? selectedClientInformation : undefined}
+              clients={clients} clientInformationTypes={clientInformationTypes} />
           </DialogContent>
         </Dialog>
       </div>

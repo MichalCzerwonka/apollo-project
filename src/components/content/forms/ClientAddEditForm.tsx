@@ -6,17 +6,16 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Client, postNewClient, putEditClient } from '../../../api/ApiClients';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Alert, { AlertProps } from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import CloseIcon from '@mui/icons-material/Close';
-import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import SnackbarHOC from '../../SnackbarHOC';
+import { SnackbarProvider, useSnackbar } from 'notistack'
 
 interface ClientAddEditFormProps {
     onClose: () => void,
@@ -26,6 +25,7 @@ interface ClientAddEditFormProps {
 const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }) => {
     const isEdit = !!client;
     let navigate = useNavigate();
+
 
     const addClientSchema = yup.object().shape({
         kod: yup.string().required(),
@@ -40,35 +40,49 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         email: yup.string().email()
     })
 
+    const { enqueueSnackbar } = useSnackbar();
 
-    const [openSnackbar, setOpenSnackbar] = React.useState(false);
-    const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-    }
-    const [errorMessage, setErrorMessage] = useState("");
     const submitHandler: SubmitHandler<Client> = (data: Client) => {
         if (isEdit) {
             putEditClient(data)
+                .then((res: any) => {
+                    enqueueSnackbar('Zmiany zostały wprowadzone.', {
+                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        variant: "info",
+                        autoHideDuration: 3000
+                    });
+                })
                 .catch((error: any) => {
                     if (error.response.status === 401) {
                         localStorage.clear();
                         navigate('/login');
                     }
-                    setErrorMessage(error.response.data.message);
-                    setOpenSnackbar(true);
+                    enqueueSnackbar(error.response.data.message, {
+                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        variant: "error",
+                        autoHideDuration: 3000
+                    });
                 });
         }
         else {
             postNewClient(data)
+                .then((res: any) => {
+                    enqueueSnackbar('Klient został dodany.', {
+                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        variant: "info",
+                        autoHideDuration: 3000
+                    });
+                })
                 .catch((error: any) => {
                     if (error.response.status === 401) {
                         localStorage.clear();
                         navigate('/login');
                     }
-                    setErrorMessage(error.response.data.message);
-                    setOpenSnackbar(true);
+                    enqueueSnackbar(error.response.data.message, {
+                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        variant: "error",
+                        autoHideDuration: 3000
+                    });
                 });
         }
 
@@ -143,7 +157,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                     <Button onClick={onClose}
                         style={{ margin: '10' }}
                         variant="contained"
-                        endIcon={<BlockIcon />}>Anuluj</Button>
+                        endIcon={<BlockIcon />}>Zamknij</Button>
 
                     <Button type="submit"
                         variant="contained"
@@ -153,32 +167,6 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                 </Stack>
             </section>
         </div>
-
-        <Snackbar
-            open={openSnackbar}
-            autoHideDuration={6000}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            onClose={handleCloseSnackbar}
-        >
-            <Alert severity="error"
-                sx={{ width: '100%' }}
-
-                action={
-                    <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                        onClick={() => {
-                            setOpenSnackbar(false);
-                        }}
-                    >
-                        <CloseIcon fontSize="inherit" />
-                    </IconButton>
-                }>
-                <AlertTitle>Wystąpił błąd</AlertTitle>
-                {errorMessage}
-            </Alert>
-        </Snackbar>
     </form>
 
 }
