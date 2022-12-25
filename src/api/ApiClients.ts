@@ -38,6 +38,7 @@ export type Client = {
     dataUtworzenia: Date, 
     opeModyfikowal: string,
     dataModyfikacji: Date,
+    archiwalny: boolean,
     kntInformacje: ClientInformation[]
 }
 

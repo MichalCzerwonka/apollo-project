@@ -16,6 +16,7 @@ import SaveAsIcon from '@mui/icons-material/SaveAs';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { SnackbarProvider, useSnackbar } from 'notistack'
+import Checkbox from '@mui/material/Checkbox/Checkbox';
 
 interface ClientAddEditFormProps {
     onClose: () => void,
@@ -35,9 +36,8 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         nip: yup.string().required(),
         ulica: yup.string().required(),
         kodPocztowy: yup.string().required(),
-        poczta: yup.string().required(),
-        telefon: yup.string().required(),
-        email: yup.string().email()
+        poczta: yup.string().nullable(),
+        email: yup.string().email().nullable(),
     })
 
     const { enqueueSnackbar } = useSnackbar();
@@ -145,6 +145,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                     <TextField {...field} label="Telefon" fullWidth variant="outlined" error={!!errors.telefon}
                         helperText={errors.telefon ? errors.telefon?.message : ''} />
                 )} />
+
             </section>
             <section>
                 <Controller name="email" control={control} render={({ field }) => (
@@ -152,6 +153,16 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                         helperText={errors.email ? errors.email?.message : ''} />
                 )} />
             </section>
+            <section>
+                <Controller
+                    name="archiwalny"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => <Checkbox {...field} />}
+                />
+                Archiwalny
+            </section>
+            <section></section>
             <section>
                 <Stack direction="row" spacing={3}>
                     <Button onClick={onClose}

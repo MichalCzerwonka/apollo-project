@@ -101,10 +101,9 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                     control={control}
                     render={({ field: { onChange, value } }) => (
                         <Autocomplete
-                            freeSolo
                             options={clients.map((client) => ({ id: client.id, label: client.kod }))}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
-                            //getOptionLabel={(client) => client.label}
+                            getOptionLabel={(client) => client.label}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -114,7 +113,7 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                             )}
                             onChange={(_, data) => {
                                 onChange(data);
-                                return data?.id;
+                                //return data?.id;
                             }}
                             //value={value}
                             defaultValue={editedClient.map((client) => ({ id: client.id, label: client.kod }))[0]}
