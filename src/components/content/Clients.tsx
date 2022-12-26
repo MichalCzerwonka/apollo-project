@@ -15,11 +15,13 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import InventoryIcon from '@mui/icons-material/Inventory';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Alert, { AlertProps } from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import CloseIcon from '@mui/icons-material/Close';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import CheckIcon from '@mui/icons-material/Check';
+import EditAttributesIcon from '@mui/icons-material/EditAttributes';
 import Snackbar from '@mui/material/Snackbar';
 import { ClientInformation, ClientInformationType, getClientInformationTypes, getClients, getSelectedClient } from '../../api/ApiClients';
 import { useEffect } from 'react';
@@ -36,11 +38,19 @@ import ClientAddEditForm from './forms/ClientAddEditForm';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import InformationAddEditForm from './forms/InformationAddEditForm';
+import { DataGrid, GridColDef, gridColumnGroupingSelector, GridFilterModel, GridSelectionModel, GridSortItem, GridValueGetterParams } from '@mui/x-data-grid';
+import { SnackbarProvider, useSnackbar } from 'notistack'
+
 
 export default function Clients() {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [selectedClientInformation, setSelectedClientInformation] = useState<ClientInformation>();
+
+  const [showClientInformations, setShowClientInformations] = useState(false);
+  const [showInformationData, setShowInformationData] = useState(false);
 
   const [clientInformationTypes, setClientInformationTypes] = useState<ClientInformationType[]>([]);
 
@@ -80,13 +90,41 @@ export default function Clients() {
     }
   };
 
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
-  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-  }
-  const [errorMessage, setErrorMessage] = useState("");
+  const clientInformationColumns: GridColDef[] = [
+    { field: 'kitNazwa', headerName: 'Typ', minWidth: 150, flex: 0.1 },
+    { field: 'nazwa', headerName: 'Nazwa', minWidth: 150, flex: 0.7 },
+    {
+      field: 'archiwalny', headerName: 'Archiwum', flex: 0.2,
+      renderCell: (params) => {
+        return params.value ? (
+          <InventoryIcon
+          />
+        ) : (
+          <EditAttributesIcon
+          />
+        );
+      },
+    },
+  ];
+
+  const [sortModel, setSortModel] = React.useState<GridSortItem[]>(
+    [{
+      field: 'kitNazwa',
+      sort: 'asc',
+    },
+    ]
+  );
+  const [filterModel, setFilterModel] = React.useState<GridFilterModel>({
+    items: [{ columnField: 'archiwalny', operatorValue: 'contains', value: 'false' }],
+  });
+
+  const onRowsSelectionHandler = (information: GridSelectionModel) => {
+    const selectedRowsData = information.map((id) => selectedClient?.kntInformacje.find((row) => row.id === id));
+    setSelectedClientInformation(selectedRowsData[0]);
+    setShowInformationData(true);
+    handleCanUserEditInformationButtonDisabled();
+  };
+
 
   useEffect(() => {
     getClients().then((res) => {
@@ -97,8 +135,11 @@ export default function Clients() {
           localStorage.clear();
           navigate('/login');
         }
-        setErrorMessage(error.response.data.message);
-        setOpenSnackbar(true);
+        enqueueSnackbar(error.response.data.message, {
+          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          variant: "error",
+          autoHideDuration: 4000
+        });
       });
 
     getClientInformationTypes().then((res) => {
@@ -109,8 +150,11 @@ export default function Clients() {
           localStorage.clear();
           navigate('/login');
         }
-        setErrorMessage(error.response.data.message);
-        setOpenSnackbar(true);
+        enqueueSnackbar(error.response.data.message, {
+          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          variant: "error",
+          autoHideDuration: 4000
+        });
       });
   }, []);
 
@@ -129,15 +173,26 @@ export default function Clients() {
               if (value !== null) {
                 getSelectedClient(value.id).then((res) => {
                   setSelectedClient(res.data);
+                  setShowClientInformations(true);
                   handleCanUserEditClient();
                 }).catch((error) => {
                   if (error.response.status === 401) {
                     localStorage.clear();
                     navigate('/login');
                   }
-                  setErrorMessage(error.response.data.message);
-                  setOpenSnackbar(true);
+                  enqueueSnackbar(error.response.data.message, {
+                    anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                    variant: "error",
+                    autoHideDuration: 4000
+                  });
                 });
+              }
+              else {
+                setShowClientInformations(false);
+                setShowInformationData(false);
+                setEditClientButtonDisabled(true);
+                setEditInformationButtonDisabled(true);
+                setSelectedClient(undefined);
               }
             }}
             options={clients.map((client) => ({ id: client.id, label: `${client.kod} - ${client.nazwa1}` }))}
@@ -153,6 +208,7 @@ export default function Clients() {
             onClick={() => {
               setOpenAddEditClientDialog(true);
               setIsEditClient(true);
+
             }}>
             Edytuj
           </Button>
@@ -191,16 +247,28 @@ export default function Clients() {
                 }}>
                 Edytuj
               </Button>
-              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
-                startIcon={<InventoryIcon />}
-                disabled={editClientButtonDisabled}
-                onClick={() => {
-
-                }}>
-                Pokaż archiwalne
-              </Button>
             </Box>
-            <TableContainer component={Paper}>
+            <div style={{ height: 650, width: '100%' }}>
+              {showClientInformations && (<DataGrid
+                rows={selectedClient ? selectedClient.kntInformacje : []}
+                columns={clientInformationColumns}
+                pageSize={10}
+                onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+                sortingOrder={['desc', 'asc']}
+                sortModel={sortModel}
+                onSortModelChange={(model) => setSortModel(model)}
+                filterModel={filterModel}
+                onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
+
+                //loading={true}
+                // onRowSelectionModelChange={(newRowSelectionModel : ClientInformation) => {
+                //   setSelectedClientInformation(newRowSelectionModel);
+                //   handleCanUserEditInformationButtonDisabled();
+                // }}
+                rowsPerPageOptions={[10]}
+              />)}
+            </div>
+            {/* <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table" id="table">
                 <TableHead>
                   <TableRow>
@@ -231,10 +299,10 @@ export default function Clients() {
 
                 </TableBody>
               </Table>
-            </TableContainer>
+            </TableContainer> */}
           </Grid>
           <Grid item xs={5} >
-            <Card variant="outlined" >
+            {showInformationData && (<Card variant="outlined" >
               <CardContent>
                 <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
                   {selectedClientInformation?.nazwa}
@@ -249,6 +317,7 @@ export default function Clients() {
                 </Tooltip>
               </CardActions>
             </Card>
+            )}
           </Grid>
         </Grid>
         {/*  Dodawanie / edycja klienta */}
@@ -272,31 +341,6 @@ export default function Clients() {
           </DialogContent>
         </Dialog>
       </div>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert severity="error"
-          sx={{ width: '100%' }}
-
-          action={
-            <IconButton
-              aria-label="close"
-              color="inherit"
-              size="small"
-              onClick={() => {
-                setOpenSnackbar(false);
-              }}
-            >
-              <CloseIcon fontSize="inherit" />
-            </IconButton>
-          }>
-          <AlertTitle>Wystąpił błąd</AlertTitle>
-          {errorMessage}
-        </Alert>
-      </Snackbar>
     </Box >
   );
 }
