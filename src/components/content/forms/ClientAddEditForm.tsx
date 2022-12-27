@@ -165,16 +165,17 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
             <section></section>
             <section>
                 <Stack direction="row" spacing={3}>
-                    <Button onClick={onClose}
-                        style={{ margin: '10' }}
-                        variant="contained"
-                        endIcon={<BlockIcon />}>Zamknij</Button>
-
                     <Button type="submit"
                         variant="contained"
+                        color="success"
                         endIcon={isEdit ? (<> <SaveAsIcon /></>) : (<><PersonAddIcon /></>)}>
                         {isEdit ? "Zapisz zmiany" : "Dodaj"}
                     </Button>
+                    <Button onClick={onClose}
+                        style={{ margin: '10' }}
+                        variant="contained"
+                        color="error"
+                        endIcon={<BlockIcon />}>Zamknij</Button>
                 </Stack>
             </section>
         </div>

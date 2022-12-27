@@ -39,7 +39,9 @@ import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import InformationAddEditForm from './forms/InformationAddEditForm';
 import { DataGrid, GridColDef, gridColumnGroupingSelector, GridFilterModel, GridSelectionModel, GridSortItem, GridValueGetterParams } from '@mui/x-data-grid';
-import { SnackbarProvider, useSnackbar } from 'notistack'
+import { SnackbarProvider, useSnackbar } from 'notistack';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import EditRoadIcon from '@mui/icons-material/EditRoad';
 
 
 export default function Clients() {
@@ -91,7 +93,7 @@ export default function Clients() {
   };
 
   const clientInformationColumns: GridColDef[] = [
-    { field: 'kitNazwa', headerName: 'Typ', minWidth: 150, flex: 0.1 },
+    { field: 'kitNazwa', headerName: 'Typ', minWidth: 150, flex: 0.1, },
     { field: 'nazwa', headerName: 'Nazwa', minWidth: 150, flex: 0.7 },
     {
       field: 'archiwalny', headerName: 'Archiwum', flex: 0.2,
@@ -201,9 +203,11 @@ export default function Clients() {
           />
         </Grid>
         <Grid item xs={1}>
-          <Button variant="outlined" size="large"
-            startIcon={<CreateIcon />}
+          <Button size="large"
+            startIcon={<PersonSearchIcon />}
             disabled={editClientButtonDisabled}
+            variant="contained"
+            color="warning"
             sx={{ width: '100%' }}
             onClick={() => {
               setOpenAddEditClientDialog(true);
@@ -214,8 +218,10 @@ export default function Clients() {
           </Button>
         </Grid>
         <Grid item xs={1}>
-          <Button variant="outlined" size="large"
+          <Button size="large"
             startIcon={<PersonAddIcon />}
+            variant="contained"
+            color="success"
             sx={{ width: '100%' }}
             onClick={() => {
               setOpenAddEditClientDialog(true);
@@ -232,20 +238,24 @@ export default function Clients() {
             <Box style={{ marginBottom: '10px', textAlign: 'left' }}>
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
                 startIcon={<PostAddIcon />}
+                variant="contained"
+                color="success"
                 onClick={() => {
                   setIsEditClientInformation(false);
                   setOpenAddEditClientInformationDialog(true);
                 }}>
-                Dodaj
+                Dodaj wpis
               </Button>
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
-                startIcon={<CreateIcon />}
+                startIcon={<EditRoadIcon />}
                 disabled={editInformationButtonDisabled}
+                variant="contained"
+                color="warning"
                 onClick={() => {
                   setIsEditClientInformation(true);
                   setOpenAddEditClientInformationDialog(true);
                 }}>
-                Edytuj
+                Edytuj wpis
               </Button>
             </Box>
             <div style={{ height: 650, width: '100%' }}>
@@ -261,10 +271,6 @@ export default function Clients() {
                 onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 
                 //loading={true}
-                // onRowSelectionModelChange={(newRowSelectionModel : ClientInformation) => {
-                //   setSelectedClientInformation(newRowSelectionModel);
-                //   handleCanUserEditInformationButtonDisabled();
-                // }}
                 rowsPerPageOptions={[10]}
               />)}
             </div>
@@ -302,21 +308,18 @@ export default function Clients() {
             </TableContainer> */}
           </Grid>
           <Grid item xs={5} >
-            {showInformationData && (<Card variant="outlined" >
-              <CardContent>
-                <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
-                  {selectedClientInformation?.nazwa}
-                </Typography>
-                <h5 style={{ textAlign: 'left', flex: 1, flexWrap: 'wrap', flexShrink: 1 }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
-              </CardContent>
-              <CardActions>
-                <Tooltip title={modificationToolTip}>
-                  <IconButton>
-                    <HelpOutlineIcon />
-                  </IconButton>
-                </Tooltip>
-              </CardActions>
-            </Card>
+            {showInformationData && (<Box overflow="auto" flex={1} flexDirection="column" display="flex" p={2}
+              style={{ textAlign: 'left', backgroundColor: "whitesmoke" }} >
+              <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
+                {selectedClientInformation?.nazwa}
+              </Typography>
+              <h5 style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
+              <Tooltip title={modificationToolTip}>
+                <IconButton>
+                  <HelpOutlineIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
             )}
           </Grid>
         </Grid>

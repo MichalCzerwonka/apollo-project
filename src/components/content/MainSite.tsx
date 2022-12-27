@@ -24,7 +24,7 @@ function MainSite() {
                 sx={{ borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}
             >
                 <Toolbar>
-                    <Grid container spacing={2} alignItems="center">
+                    {/* <Grid container spacing={2} alignItems="center">
                         <Grid item>
                             <SearchIcon color="inherit" sx={{ display: 'block' }} />
                         </Grid>
@@ -49,7 +49,7 @@ function MainSite() {
                                 </IconButton>
                             </Tooltip>
                         </Grid>
-                    </Grid>
+                    </Grid> */}
                 </Toolbar>
             </AppBar>
             <Typography sx={{ my: 5, mx: 2 }} color="text.secondary" align="center">

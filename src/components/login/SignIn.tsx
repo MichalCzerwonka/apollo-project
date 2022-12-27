@@ -25,11 +25,10 @@ import { loginAccount, LoginData } from '../../api/ApiAccount';
 import { loginSchema } from '../../validators/account';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useState } from 'react';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 export default function SignIn() {
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const { isAuthenticated } = useAuthenticatedUser();
   const { register, handleSubmit, formState: { errors } } = useForm<LoginData>({
@@ -48,17 +47,13 @@ export default function SignIn() {
       navigate('/');
     })
       .catch((error) => {
-        setErrorMessage(error.response.data.message);
-        setOpenSnackbar(true);
-        console.log(error.response.data);
+        enqueueSnackbar(error.response.data.message, {
+          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          variant: "error",
+          autoHideDuration: 4000
+        });
       });
   };
-
-  const handleCloseSnackbar = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-  }
 
   if (isAuthenticated) {
     return <Navigate to={'/'} replace />;
@@ -92,30 +87,6 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
-          <Snackbar
-            open={openSnackbar}
-            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            onClose={handleCloseSnackbar}
-          >
-            <Alert severity="error"
-              sx={{ width: '100%' }}
-
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setOpenSnackbar(false);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }>
-              <AlertTitle>Błąd logowania</AlertTitle>
-              {errorMessage}
-            </Alert>
-          </Snackbar>
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
@@ -145,10 +116,10 @@ export default function SignIn() {
               autoComplete="current-password"
               {...register('password')}
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Zapamiętaj mnie"
-            />
+            /> */}
             <Button
               type="submit"
               fullWidth
@@ -160,14 +131,14 @@ export default function SignIn() {
 
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
+                {/* <Link href="#" variant="body2">
                   Zapomniałeś hasła?
-                </Link>
+                </Link> */}
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                {/* <Link href="#" variant="body2">
                   {'Utwórz konto'}
-                </Link>
+                </Link> */}
               </Grid>
             </Grid>
             <Copyright sx={{ mt: 5 }} />

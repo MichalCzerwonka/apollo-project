@@ -5,7 +5,7 @@ export const apiConfig = {
     };
 
 export default axios.create({
-  baseURL: `https://localhost:7179/`,
+  baseURL: `http://192.168.13.14:5000/`,
 });
 
 

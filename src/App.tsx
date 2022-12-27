@@ -9,7 +9,7 @@ import { PrivateRoute } from './components/routing/PrivateRoute';
 import Clients from './components/content/Clients';
 import MainSite from './components/content/MainSite';
 import { SnackbarProvider } from "notistack";
-
+import NotFound from './components/NotFound';
 export let theme = createTheme({
   palette: {
     primary: {
@@ -171,11 +171,12 @@ function App() {
                 <Route path="/clients" element={<Clients />} />
               </Route>
               <Route path="/login" element={<SignIn />} />
-              <Route path="/*" element={
+              {/* <Route path="/*" element={
                 <PrivateRoute>
                   <Dashboard />
                 </PrivateRoute>
-              } />
+              } /> */}
+              <Route path="/*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>
