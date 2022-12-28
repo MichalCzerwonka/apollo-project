@@ -16,6 +16,7 @@ import { DanePogodowe } from '../../api/ApiWeather';
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 interface HeaderProps {
     onDrawerToggle: () => void;
@@ -24,6 +25,7 @@ interface HeaderProps {
 
 
 export default function Header(props: HeaderProps) {
+    const { enqueueSnackbar } = useSnackbar();
     const [currentTemperature, setCurrentTemperature] = useState<DanePogodowe>();
     const current = new Date();
     const date = `${current.getDate()}.${current.getMonth() + 1}.${current.getFullYear()}`;
@@ -38,11 +40,17 @@ export default function Header(props: HeaderProps) {
             setCurrentTemperature(res.data);
         })
             .catch((error: any) => {
+
                 if (error.response.status === 401) {
+                    enqueueSnackbar("Sesja wygasła", {
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                        variant: "error",
+                        autoHideDuration: 4000
+                    });
                     localStorage.clear();
                     navigate('/login');
                 }
-                console.log(error);
+
             })
     }, []);
 

@@ -9,8 +9,9 @@ export type ClientInformationType = {
 export type ClientInformation = {
   id: number,
   kntId: number,
+  kntKod: string,
   kitId: number,
-  kitNazwa: string,
+  kitKod: string,
   nazwa: string,
   opis: string,
   archiwalny: boolean,
@@ -18,7 +19,7 @@ export type ClientInformation = {
   dataUtworzenia: Date,
   opeModyfikowal: string,
   dataModyfikacji: Date,
-  wybrany: boolean
+  wybrany: boolean,
 }
 
 export type Client = {
@@ -62,9 +63,12 @@ export const postNewClient = (data: Client) => {
   return Api.post('/clients/add', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
-export const postNewClientInformation = (data: ClientInformation) => {
+export const postNewClientInformation = (data: ClientInformation, clientCode:string | undefined) => {
+  if(typeof(clientCode) === "string"){
+  data.kntKod = clientCode;
+  }
   return Api.post('/information/add', data, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
+   headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
 
 export const putEditClient = (data: Client) => {
@@ -72,6 +76,7 @@ export const putEditClient = (data: Client) => {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
 export const putEditClientInformation = (data: ClientInformation) => {
+  console.log(data);
   return Api.put('/information/edit', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };

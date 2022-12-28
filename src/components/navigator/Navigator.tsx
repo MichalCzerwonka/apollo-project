@@ -7,7 +7,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -15,6 +14,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import ContactMailIcon from '@mui/icons-material/ContactMail';
 import { Link } from 'react-router-dom';
 import UnfoldMoreDoubleIcon from '@mui/icons-material/UnfoldMoreDouble';
+import BallotIcon from '@mui/icons-material/Ballot';
 
 const categories = [
   {
@@ -46,20 +46,22 @@ export default function Navigator(props: DrawerProps) {
   return (
     <Drawer variant="permanent" {...other}>
       <List disablePadding>
-        <ListItem sx={{ ...item, ...itemCategory, fontSize: 22, color: '#fff' }}>
-          <ListItemIcon>
-            <RocketLaunchIcon />
-          </ListItemIcon>
-          Projekt Apollo
-        </ListItem>
         <Link to="/">
+          <ListItem sx={{ ...item, ...itemCategory, fontSize: 22, color: '#fff' }}>
+            <ListItemIcon>
+              <RocketLaunchIcon />
+            </ListItemIcon>
+            Projekt Apollo
+          </ListItem>
+        </Link>
+        {/* <Link to="/">
           <ListItem sx={{ ...item, ...itemCategory }}>
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
             <ListItemText>Strona główna</ListItemText>
           </ListItem>
-        </Link>
+        </Link> */}
         {categories.map(({ id, children }) => (
           <Box key={id} sx={{ bgcolor: '#101F33' }}>
             <ListItem sx={{ py: 2, px: 3 }}>
@@ -112,6 +114,14 @@ export default function Navigator(props: DrawerProps) {
                 <ListItemButton sx={item}>
                   <ListItemIcon><PeopleIcon /></ListItemIcon>
                   <ListItemText>→ HRM Adam Czerwonka</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            </a>
+            <a href='https://arcussoftcompl.sharepoint.com/_layouts/15/sharepoint.aspx' target='_blank' rel="noreferrer">
+              <ListItem disablePadding key='Sharepoint'>
+                <ListItemButton sx={item}>
+                  <ListItemIcon><BallotIcon /></ListItemIcon>
+                  <ListItemText>→ Sharepoint</ListItemText>
                 </ListItemButton>
               </ListItem>
             </a>

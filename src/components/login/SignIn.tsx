@@ -48,7 +48,7 @@ export default function SignIn() {
     })
       .catch((error) => {
         enqueueSnackbar(error.response.data.message, {
-          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          anchorOrigin: { vertical: "bottom", horizontal: "left" },
           variant: "error",
           autoHideDuration: 4000
         });

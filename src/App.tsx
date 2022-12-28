@@ -159,7 +159,6 @@ function App() {
     <SnackbarProvider>
       <div className="App">
         <ThemeProvider theme={theme}>
-
           <BrowserRouter>
             <Routes>
               <Route path="/" element={

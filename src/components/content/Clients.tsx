@@ -38,10 +38,12 @@ import ClientAddEditForm from './forms/ClientAddEditForm';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import InformationAddEditForm from './forms/InformationAddEditForm';
-import { DataGrid, GridColDef, gridColumnGroupingSelector, GridFilterModel, GridSelectionModel, GridSortItem, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, gridColumnGroupingSelector, GridFilterModel, GridSelectionModel, GridSortItem, GridToolbarQuickFilter, GridValueGetterParams } from '@mui/x-data-grid';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import EditRoadIcon from '@mui/icons-material/EditRoad';
+import PersonPinIcon from '@mui/icons-material/PersonPin';
+import LockClockIcon from '@mui/icons-material/LockClock';
 
 
 export default function Clients() {
@@ -56,9 +58,6 @@ export default function Clients() {
 
   const [clientInformationTypes, setClientInformationTypes] = useState<ClientInformationType[]>([]);
 
-  const [editClientButtonDisabled, setEditClientButtonDisabled] = React.useState(true);
-  const [editInformationButtonDisabled, setEditInformationButtonDisabled] = React.useState(true);
-
   const [isEditClient, setIsEditClient] = useState(false);
   const [isEditClientInformation, setIsEditClientInformation] = useState(false);
   const [openAddEditClientDialog, setOpenAddEditClientDialog] = React.useState(false);
@@ -69,31 +68,60 @@ export default function Clients() {
   const handleCloseCreateEditClientDialog = () => {
     setOpenAddEditClientDialog(false);
     setIsEditClient(false);
+
+    getClients().then((res) => {
+      setClients(res.data);
+    })
+      .catch((error) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate('/login');
+        }
+        enqueueSnackbar(error.response.data.message, {
+          anchorOrigin: { vertical: "bottom", horizontal: "left" },
+          variant: "error",
+          autoHideDuration: 4000
+        });
+      });
   };
   const handleCloseAddEditClientInformationDialog = () => {
     setOpenAddEditClientInformationDialog(false);
     setIsEditClientInformation(false);
+    if (selectedClient) {
+      getSelectedClient(selectedClient.id).then((res) => {
+        setSelectedClient(res.data);
+        setShowClientInformations(true);
+      }).catch((error) => {
+        if (error.response.status === 401) {
+          localStorage.clear();
+          navigate('/login');
+        }
+        enqueueSnackbar(error.response.data.message, {
+          anchorOrigin: { vertical: "bottom", horizontal: "left" },
+          variant: "error",
+          autoHideDuration: 4000
+        });
+      });
+    }
+
   };
 
-  const handleCanUserEditClient = () => {
-    if (selectedClient !== null) {
-      setEditClientButtonDisabled(false);
-    }
-    else {
-      setEditClientButtonDisabled(true);
-    }
-  };
-  const handleCanUserEditInformationButtonDisabled = () => {
-    if (selectedClientInformation !== null) {
-      setEditInformationButtonDisabled(false);
-    }
-    else {
-      setEditInformationButtonDisabled(true);
-    }
-  };
+  function QuickSearchToolbar() {
+    return (
+      <Box
+        sx={{
+          p: 0.5,
+          pb: 0,
+        }}
+      >
+        <GridToolbarQuickFilter fullWidth placeholder='Wyszukaj...' />
+      </Box>
+    );
+  }
+
 
   const clientInformationColumns: GridColDef[] = [
-    { field: 'kitNazwa', headerName: 'Typ', minWidth: 150, flex: 0.1, },
+    { field: 'kitKod', headerName: 'Typ', minWidth: 150, flex: 0.1, },
     { field: 'nazwa', headerName: 'Nazwa', minWidth: 150, flex: 0.7 },
     {
       field: 'archiwalny', headerName: 'Archiwum', flex: 0.2,
@@ -102,16 +130,16 @@ export default function Clients() {
           <InventoryIcon
           />
         ) : (
-          <EditAttributesIcon
-          />
+          ''
         );
       },
     },
+    { field: 'opis', hide: true },
   ];
 
   const [sortModel, setSortModel] = React.useState<GridSortItem[]>(
     [{
-      field: 'kitNazwa',
+      field: 'kitKod',
       sort: 'asc',
     },
     ]
@@ -124,7 +152,6 @@ export default function Clients() {
     const selectedRowsData = information.map((id) => selectedClient?.kntInformacje.find((row) => row.id === id));
     setSelectedClientInformation(selectedRowsData[0]);
     setShowInformationData(true);
-    handleCanUserEditInformationButtonDisabled();
   };
 
 
@@ -138,7 +165,7 @@ export default function Clients() {
           navigate('/login');
         }
         enqueueSnackbar(error.response.data.message, {
-          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          anchorOrigin: { vertical: "bottom", horizontal: "left" },
           variant: "error",
           autoHideDuration: 4000
         });
@@ -153,7 +180,7 @@ export default function Clients() {
           navigate('/login');
         }
         enqueueSnackbar(error.response.data.message, {
-          anchorOrigin: { vertical: "bottom", horizontal: "right" },
+          anchorOrigin: { vertical: "bottom", horizontal: "left" },
           variant: "error",
           autoHideDuration: 4000
         });
@@ -176,14 +203,13 @@ export default function Clients() {
                 getSelectedClient(value.id).then((res) => {
                   setSelectedClient(res.data);
                   setShowClientInformations(true);
-                  handleCanUserEditClient();
                 }).catch((error) => {
                   if (error.response.status === 401) {
                     localStorage.clear();
                     navigate('/login');
                   }
                   enqueueSnackbar(error.response.data.message, {
-                    anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                    anchorOrigin: { vertical: "bottom", horizontal: "left" },
                     variant: "error",
                     autoHideDuration: 4000
                   });
@@ -192,12 +218,11 @@ export default function Clients() {
               else {
                 setShowClientInformations(false);
                 setShowInformationData(false);
-                setEditClientButtonDisabled(true);
-                setEditInformationButtonDisabled(true);
                 setSelectedClient(undefined);
+                setSelectedClientInformation(undefined);
               }
             }}
-            options={clients.map((client) => ({ id: client.id, label: `${client.kod} - ${client.nazwa1}` }))}
+            options={clients.map((client) => ({ id: client.id, label: `${client.archiwalny ? '[X]' : ''} ${client.kod} - ${client.nazwa1} ` }))}
             sx={{ width: '100%' }}
             renderInput={(params) => <TextField {...params} label="Kontrahent" />}
           />
@@ -205,9 +230,11 @@ export default function Clients() {
         <Grid item xs={1}>
           <Button size="large"
             startIcon={<PersonSearchIcon />}
-            disabled={editClientButtonDisabled}
+            tabIndex={-1}
+            disabled={!selectedClient}
             variant="contained"
             color="warning"
+
             sx={{ width: '100%' }}
             onClick={() => {
               setOpenAddEditClientDialog(true);
@@ -217,9 +244,10 @@ export default function Clients() {
             Edytuj
           </Button>
         </Grid>
-        <Grid item xs={1}>
+        <Grid item xs={1} >
           <Button size="large"
             startIcon={<PersonAddIcon />}
+            tabIndex={-1}
             variant="contained"
             color="success"
             sx={{ width: '100%' }}
@@ -238,6 +266,8 @@ export default function Clients() {
             <Box style={{ marginBottom: '10px', textAlign: 'left' }}>
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
                 startIcon={<PostAddIcon />}
+                tabIndex={-1}
+                disabled={!selectedClient}
                 variant="contained"
                 color="success"
                 onClick={() => {
@@ -248,7 +278,8 @@ export default function Clients() {
               </Button>
               <Button style={{ marginRight: '10px', marginLeft: '10px' }}
                 startIcon={<EditRoadIcon />}
-                disabled={editInformationButtonDisabled}
+                tabIndex={-1}
+                disabled={!selectedClientInformation}
                 variant="contained"
                 color="warning"
                 onClick={() => {
@@ -258,21 +289,25 @@ export default function Clients() {
                 Edytuj wpis
               </Button>
             </Box>
-            <div style={{ height: 650, width: '100%' }}>
-              {showClientInformations && (<DataGrid
-                rows={selectedClient ? selectedClient.kntInformacje : []}
-                columns={clientInformationColumns}
-                pageSize={10}
-                onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
-                sortingOrder={['desc', 'asc']}
-                sortModel={sortModel}
-                onSortModelChange={(model) => setSortModel(model)}
-                filterModel={filterModel}
-                onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
+            <div style={{ height: 600, width: '100%' }}>
+              {showClientInformations && (
+                <DataGrid
+                  rows={selectedClient ? selectedClient.kntInformacje : []}
+                  disableColumnSelector
+                  disableDensitySelector
+                  columns={clientInformationColumns}
+                  pageSize={9}
+                  onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+                  sortingOrder={['desc', 'asc']}
+                  sortModel={sortModel}
+                  onSortModelChange={(model) => setSortModel(model)}
+                  filterModel={filterModel}
+                  components={{ Toolbar: QuickSearchToolbar }}
+                  onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 
-                //loading={true}
-                rowsPerPageOptions={[10]}
-              />)}
+                  //loading={true}
+                  rowsPerPageOptions={[9]}
+                />)}
             </div>
             {/* <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table" id="table">
@@ -308,15 +343,20 @@ export default function Clients() {
             </TableContainer> */}
           </Grid>
           <Grid item xs={5} >
-            {showInformationData && (<Box overflow="auto" flex={1} flexDirection="column" display="flex" p={2}
+            {showInformationData && (<Box overflow="scroll" maxHeight={600} maxWidth={700} p={2}
               style={{ textAlign: 'left', backgroundColor: "whitesmoke" }} >
               <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
                 {selectedClientInformation?.nazwa}
               </Typography>
               <h5 style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
-              <Tooltip title={modificationToolTip}>
+              <Tooltip title={`Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`} style={{ width: 40 }}>
                 <IconButton>
-                  <HelpOutlineIcon />
+                  <LockClockIcon />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={`Modyfikował: ${selectedClientInformation?.opeModyfikowal}`} style={{ width: 40 }}>
+                <IconButton>
+                  <PersonPinIcon />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -340,6 +380,7 @@ export default function Clients() {
           <DialogContent>
             <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog}
               clientInformation={isEditClientInformation ? selectedClientInformation : undefined}
+              selectedClientCode={selectedClient?.kod}
               clients={clients} clientInformationTypes={clientInformationTypes} />
           </DialogContent>
         </Dialog>

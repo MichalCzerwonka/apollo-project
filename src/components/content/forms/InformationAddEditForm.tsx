@@ -12,26 +12,32 @@ import Autocomplete from '@mui/material/Autocomplete/Autocomplete';
 import Stack from '@mui/material/Stack/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import { Checkbox } from '@mui/material';
+import { Checkbox, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material';
 import { SnackbarProvider, useSnackbar } from 'notistack'
 
 interface InformationAddEditFormProps {
     onClose: () => void,
     clientInformation?: ClientInformation,
+    selectedClientCode?: string
     clients: Client[],
     clientInformationTypes: ClientInformationType[]
 }
 
-const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose, clientInformation, clients, clientInformationTypes }) => {
+const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose, clientInformation, selectedClientCode, clients, clientInformationTypes }) => {
     const isEdit = !!clientInformation;
     let navigate = useNavigate();
 
     const addInformationSchema = yup.object().shape({
-        //kntId: yup.number().required(),
-        //kitId: yup.number().required(),
+        kitKod: yup.string().required(),
         nazwa: yup.string().required(),
         opis: yup.string().required(),
     })
+
+    yup.setLocale({
+        mixed: {
+            required: 'Pole obowiązkowe',
+        },
+    });
 
     const submitHandler: SubmitHandler<ClientInformation> = (data: ClientInformation) => {
         console.log(data.kntId);
@@ -39,7 +45,7 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
             putEditClientInformation(data)
                 .then((res: any) => {
                     enqueueSnackbar('Zmiany zostały wprowadzone.', {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
                         autoHideDuration: 3000
                     });
@@ -50,17 +56,17 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                         navigate('/login');
                     }
                     enqueueSnackbar(error.response.data.message, {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "error",
                         autoHideDuration: 3000
                     });
                 });
         }
         else {
-            postNewClientInformation(data)
+            postNewClientInformation(data, selectedClientCode)
                 .then((res: any) => {
                     enqueueSnackbar('Informacja została dodana.', {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
                         autoHideDuration: 3000
                     });
@@ -71,7 +77,7 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                         navigate('/login');
                     }
                     enqueueSnackbar(error.response.data.message, {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "error",
                         autoHideDuration: 3000
                     });
@@ -96,7 +102,11 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
         <br />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '20px' }}>
             <section>
-                <Controller
+                <Controller name="kntKod" control={control} render={({ field }) => (
+                    <TextField {...field} value={selectedClientCode} disabled={true} label="Kontrahent" multiline fullWidth variant="outlined" error={!!errors.kntKod}
+                        helperText={errors.kntKod ? errors.kntKod?.message : ''} />
+                )} />
+                {/* <Controller
                     name="kntId"
                     control={control}
                     render={({ field: { onChange, value } }) => (
@@ -120,11 +130,26 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                         />
 
                     )}
-                />
+                /> */}
 
             </section>
             <section>
-                <Controller
+                <Controller name="kitKod" control={control} render={({ field }) => (
+                    <TextField select
+                        label="Typ"
+                        {...field}
+                        fullWidth
+                        error={!!errors.kitKod}
+                        helperText={errors.kitKod ? errors.kitKod?.message : ''}
+                        defaultValue={clientInformation?.kitKod ? clientInformation?.kitKod : undefined}>
+                        {clientInformationTypes.map((type) => (
+                            <MenuItem key={type.id} value={type.kod}>
+                                {type.kod}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                )} />
+                {/* <Controller
                     name="kitId"
                     control={control}
                     render={({ field: { onChange, value } }) => (
@@ -147,7 +172,7 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                         />
 
                     )}
-                />
+                /> */}
             </section>
             <section>
                 <Controller name="nazwa" control={control} render={({ field }) => (
@@ -158,9 +183,21 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                     name="archiwalny"
                     control={control}
                     rules={{ required: true }}
-                    render={({ field }) => <Checkbox {...field} />}
+                    render={({ field }) => <Checkbox {...field} checked={field.value} />}
                 />
                 Archiwalny
+                <Stack direction="row" spacing={3} my={3}>
+                    <Button type="submit"
+                        variant="contained"
+                        color="success"
+                        endIcon={isEdit ? (<> <SaveAsIcon /></>) : (<><PostAddIcon /></>)}>
+                        {isEdit ? "Zapisz zmiany" : "Dodaj wpis"}
+                    </Button>
+                    <Button onClick={onClose}
+                        variant="contained"
+                        color="error"
+                        endIcon={<BlockIcon />}>Zamknij</Button>
+                </Stack>
             </section>
             <section>
                 <Controller name="opis" control={control} render={({ field }) => (
@@ -169,18 +206,7 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
                 )} />
             </section>
             <section>
-                <Stack direction="row" spacing={3}>
-                    <Button type="submit"
-                        variant="contained"
-                        color="success"
-                        endIcon={isEdit ? (<> <SaveAsIcon /></>) : (<><PostAddIcon /></>)}>
-                        {isEdit ? "Zapisz zmiany" : "Dodaj"}
-                    </Button>
-                    <Button onClick={onClose}
-                        variant="contained"
-                        color="error"
-                        endIcon={<BlockIcon />}>Zamknij</Button>
-                </Stack>
+
             </section>
         </div>
     </form>

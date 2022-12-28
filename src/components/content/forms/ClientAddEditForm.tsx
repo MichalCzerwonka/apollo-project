@@ -32,10 +32,10 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         kod: yup.string().required(),
         nazwa1: yup.string().required(),
         nazwa2: yup.string().nullable(),
-        miasto: yup.string().required(),
-        nip: yup.string().required(),
-        ulica: yup.string().required(),
-        kodPocztowy: yup.string().required(),
+        miasto: yup.string().nullable(),
+        nip: yup.string().nullable(),
+        ulica: yup.string().nullable(),
+        kodPocztowy: yup.string().nullable(),
         poczta: yup.string().nullable(),
         email: yup.string().email().nullable(),
     })
@@ -47,7 +47,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
             putEditClient(data)
                 .then((res: any) => {
                     enqueueSnackbar('Zmiany zostały wprowadzone.', {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
                         autoHideDuration: 3000
                     });
@@ -58,7 +58,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                         navigate('/login');
                     }
                     enqueueSnackbar(error.response.data.message, {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "error",
                         autoHideDuration: 3000
                     });
@@ -68,7 +68,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
             postNewClient(data)
                 .then((res: any) => {
                     enqueueSnackbar('Klient został dodany.', {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
                         autoHideDuration: 3000
                     });
@@ -79,7 +79,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                         navigate('/login');
                     }
                     enqueueSnackbar(error.response.data.message, {
-                        anchorOrigin: { vertical: "bottom", horizontal: "right" },
+                        anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "error",
                         autoHideDuration: 3000
                     });
@@ -158,7 +158,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
                     name="archiwalny"
                     control={control}
                     rules={{ required: true }}
-                    render={({ field }) => <Checkbox {...field} />}
+                    render={({ field }) => <Checkbox {...field} checked={field.value} />}
                 />
                 Archiwalny
             </section>
