@@ -5,7 +5,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Client, ClientInformation, ClientInformationType, postNewClientInformation, putEditClientInformation } from '../../../api/ApiClients';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete/Autocomplete';
@@ -38,6 +38,14 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
             required: 'Pole obowiązkowe',
         },
     });
+
+    useEffect(() => {
+        window.addEventListener('keypress', e => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        });
+    }, []);
 
     const submitHandler: SubmitHandler<ClientInformation> = (data: ClientInformation) => {
         console.log(data.kntId);
@@ -85,13 +93,13 @@ const InformationAddEditForm: React.FC<InformationAddEditFormProps> = ({ onClose
         }
 
     }
-    const editedClient = clients.filter(obj => {
-        return obj.id === clientInformation?.kntId;
-    });
+    // const editedClient = clients.filter(obj => {
+    //     return obj.id === clientInformation?.kntId;
+    // });
 
-    const editedClientInformationType = clientInformationTypes.filter(obj => {
-        return obj.id === clientInformation?.kitId;
-    });
+    // const editedClientInformationType = clientInformationTypes.filter(obj => {
+    //     return obj.id === clientInformation?.kitId;
+    // });
 
     const { control, handleSubmit, formState: { errors } } = useForm<ClientInformation>({ resolver: yupResolver(addInformationSchema), defaultValues: clientInformation });
 

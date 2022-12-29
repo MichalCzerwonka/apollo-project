@@ -6,7 +6,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Client, postNewClient, putEditClient } from '../../../api/ApiClients';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Alert, { AlertProps } from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import CloseIcon from '@mui/icons-material/Close';
@@ -87,6 +87,13 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         }
 
     }
+    useEffect(() => {
+        window.addEventListener('keypress', e => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        });
+    }, []);
 
     const { control, register, handleSubmit, watch, reset, formState: { errors } } = useForm<Client>({ resolver: yupResolver(addClientSchema), defaultValues: client });
     return <form onSubmit={handleSubmit(submitHandler)} className="form">

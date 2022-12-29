@@ -44,6 +44,7 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import EditRoadIcon from '@mui/icons-material/EditRoad';
 import PersonPinIcon from '@mui/icons-material/PersonPin';
 import LockClockIcon from '@mui/icons-material/LockClock';
+import { minWidth } from '@mui/system';
 
 
 export default function Clients() {
@@ -121,7 +122,7 @@ export default function Clients() {
 
 
   const clientInformationColumns: GridColDef[] = [
-    { field: 'kitKod', headerName: 'Typ', minWidth: 150, flex: 0.1, },
+    { field: 'kitKod', headerName: 'Typ', minWidth: 150, flex: 0.1 },
     { field: 'nazwa', headerName: 'Nazwa', minWidth: 150, flex: 0.7 },
     {
       field: 'archiwalny', headerName: 'Archiwum', flex: 0.2,
@@ -191,7 +192,7 @@ export default function Clients() {
   Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`;
 
   return (
-    <Box sx={{ minWidth: 120 }}>
+    <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2} mb={2}>
         <Grid item xs={10}>
           <Autocomplete<{ id: number, label: string }>
@@ -259,57 +260,55 @@ export default function Clients() {
           </Button>
         </Grid>
       </Grid>
-      <div style={{ height: 400, width: '100%', marginTop: '10' }}>
+      <Grid container spacing={2} style={{ textAlign: 'left' }}>
+        <Grid item xs={7}>
+          <Box style={{ marginBottom: '10px', textAlign: 'left' }}>
+            <Button style={{ marginRight: '10px', marginLeft: '10px' }}
+              startIcon={<PostAddIcon />}
+              tabIndex={-1}
+              disabled={!selectedClient}
+              variant="contained"
+              color="success"
+              onClick={() => {
+                setIsEditClientInformation(false);
+                setOpenAddEditClientInformationDialog(true);
+              }}>
+              Dodaj wpis
+            </Button>
+            <Button style={{ marginRight: '10px', marginLeft: '10px' }}
+              startIcon={<EditRoadIcon />}
+              tabIndex={-1}
+              disabled={!selectedClientInformation}
+              variant="contained"
+              color="warning"
+              onClick={() => {
+                setIsEditClientInformation(true);
+                setOpenAddEditClientInformationDialog(true);
+              }}>
+              Edytuj wpis
+            </Button>
+          </Box>
+          <Box style={{ width: '100%' }}>
+            {showClientInformations && (
+              <DataGrid autoHeight
+                rows={selectedClient ? selectedClient.kntInformacje : []}
+                disableColumnSelector
+                disableDensitySelector
+                columns={clientInformationColumns}
+                pageSize={100}
+                onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
+                sortingOrder={['desc', 'asc']}
+                sortModel={sortModel}
+                onSortModelChange={(model) => setSortModel(model)}
+                filterModel={filterModel}
+                components={{ Toolbar: QuickSearchToolbar }}
+                onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
 
-        <Grid container spacing={2} style={{ textAlign: 'left', flex: 1, flexWrap: 'wrap', flexShrink: 1 }}>
-          <Grid item xs={7}>
-            <Box style={{ marginBottom: '10px', textAlign: 'left' }}>
-              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
-                startIcon={<PostAddIcon />}
-                tabIndex={-1}
-                disabled={!selectedClient}
-                variant="contained"
-                color="success"
-                onClick={() => {
-                  setIsEditClientInformation(false);
-                  setOpenAddEditClientInformationDialog(true);
-                }}>
-                Dodaj wpis
-              </Button>
-              <Button style={{ marginRight: '10px', marginLeft: '10px' }}
-                startIcon={<EditRoadIcon />}
-                tabIndex={-1}
-                disabled={!selectedClientInformation}
-                variant="contained"
-                color="warning"
-                onClick={() => {
-                  setIsEditClientInformation(true);
-                  setOpenAddEditClientInformationDialog(true);
-                }}>
-                Edytuj wpis
-              </Button>
-            </Box>
-            <div style={{ height: 600, width: '100%' }}>
-              {showClientInformations && (
-                <DataGrid
-                  rows={selectedClient ? selectedClient.kntInformacje : []}
-                  disableColumnSelector
-                  disableDensitySelector
-                  columns={clientInformationColumns}
-                  pageSize={9}
-                  onSelectionModelChange={(ids) => onRowsSelectionHandler(ids)}
-                  sortingOrder={['desc', 'asc']}
-                  sortModel={sortModel}
-                  onSortModelChange={(model) => setSortModel(model)}
-                  filterModel={filterModel}
-                  components={{ Toolbar: QuickSearchToolbar }}
-                  onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
-
-                  //loading={true}
-                  rowsPerPageOptions={[9]}
-                />)}
-            </div>
-            {/* <TableContainer component={Paper}>
+                //loading={true}
+                rowsPerPageOptions={[100]}
+              />)}
+          </Box>
+          {/* <TableContainer component={Paper}>
               <Table sx={{ minWidth: 650 }} aria-label="simple table" id="table">
                 <TableHead>
                   <TableRow>
@@ -341,50 +340,49 @@ export default function Clients() {
                 </TableBody>
               </Table>
             </TableContainer> */}
-          </Grid>
-          <Grid item xs={5} >
-            {showInformationData && (<Box overflow="scroll" maxHeight={600} maxWidth={700} p={2}
-              style={{ textAlign: 'left', backgroundColor: "whitesmoke" }} >
-              <Typography sx={{ fontSize: 24 }} color="text.primary" gutterBottom>
-                {selectedClientInformation?.nazwa}
-              </Typography>
-              <h5 style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
-              <Tooltip title={`Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`} style={{ width: 40 }}>
-                <IconButton>
-                  <LockClockIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={`Modyfikował: ${selectedClientInformation?.opeModyfikowal}`} style={{ width: 40 }}>
-                <IconButton>
-                  <PersonPinIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-            )}
-          </Grid>
         </Grid>
-        {/*  Dodawanie / edycja klienta */}
-        <Dialog
-          open={openAddEditClientDialog}
-          onClose={handleCloseCreateEditClientDialog}
-          fullScreen>
-          <DialogContent>
-            <ClientAddEditForm onClose={handleCloseCreateEditClientDialog} client={isEditClient ? selectedClient : undefined} />
-          </DialogContent>
-        </Dialog>
-        {/*  Dodawanie / edycja informacji */}
-        <Dialog
-          open={openAddEditClientInformationDialog}
-          onClose={handleCloseAddEditClientInformationDialog}
-          fullScreen>
-          <DialogContent>
-            <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog}
-              clientInformation={isEditClientInformation ? selectedClientInformation : undefined}
-              selectedClientCode={selectedClient?.kod}
-              clients={clients} clientInformationTypes={clientInformationTypes} />
-          </DialogContent>
-        </Dialog>
-      </div>
+        <Grid item xs={5} style={{ padding: '1%' }} >
+          {showInformationData && (<Box overflow="scroll" maxHeight={700} p={2}
+            style={{ textAlign: 'left', backgroundColor: "whitesmoke", position: 'fixed', minWidth: '33%', padding: '1%' }} >
+            <Typography sx={{ fontSize: 24, textAlign: 'center', fontWeight: 'bold' }} color="text.primary" gutterBottom>
+              {selectedClientInformation?.nazwa}
+            </Typography>
+            <h5 style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', flexShrink: 1 }} dangerouslySetInnerHTML={{ __html: selectedClientInformation?.opis.replace(/\n/g, "<br />") || "" }}></h5>
+            <Tooltip title={`Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`} style={{ width: 40 }}>
+              <IconButton>
+                <LockClockIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={`Modyfikował: ${selectedClientInformation?.opeModyfikowal}`} style={{ width: 40 }}>
+              <IconButton>
+                <PersonPinIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+          )}
+        </Grid>
+      </Grid>
+      {/*  Dodawanie / edycja klienta */}
+      <Dialog
+        open={openAddEditClientDialog}
+        onClose={handleCloseCreateEditClientDialog}
+        fullScreen>
+        <DialogContent>
+          <ClientAddEditForm onClose={handleCloseCreateEditClientDialog} client={isEditClient ? selectedClient : undefined} />
+        </DialogContent>
+      </Dialog>
+      {/*  Dodawanie / edycja informacji */}
+      <Dialog
+        open={openAddEditClientInformationDialog}
+        onClose={handleCloseAddEditClientInformationDialog}
+        fullScreen>
+        <DialogContent>
+          <InformationAddEditForm onClose={handleCloseAddEditClientInformationDialog}
+            clientInformation={isEditClientInformation ? selectedClientInformation : undefined}
+            selectedClientCode={selectedClient?.kod}
+            clients={clients} clientInformationTypes={clientInformationTypes} />
+        </DialogContent>
+      </Dialog>
     </Box >
   );
 }

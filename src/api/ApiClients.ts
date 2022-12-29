@@ -76,6 +76,7 @@ export const putEditClient = (data: Client) => {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
 };
 export const putEditClientInformation = (data: ClientInformation) => {
+  console.log('edit');
   console.log(data);
   return Api.put('/information/edit', data, {
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }});
