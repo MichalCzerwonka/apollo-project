@@ -6,45 +6,25 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import CreateIcon from '@mui/icons-material/Create';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import Alert, { AlertProps } from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import CloseIcon from '@mui/icons-material/Close';
 import InventoryIcon from '@mui/icons-material/Inventory';
-import CheckIcon from '@mui/icons-material/Check';
-import EditAttributesIcon from '@mui/icons-material/EditAttributes';
-import Snackbar from '@mui/material/Snackbar';
 import { ClientInformation, ClientInformationType, getClientInformationTypes, getClients, getSelectedClient } from '../../api/ApiClients';
 import { useEffect } from 'react';
 import { Client } from '../../api/ApiClients';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import PostAddIcon from '@mui/icons-material/PostAdd';
 import ClientAddEditForm from './forms/ClientAddEditForm';
-import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import InformationAddEditForm from './forms/InformationAddEditForm';
-import { DataGrid, GridColDef, gridColumnGroupingSelector, GridFilterModel, GridSelectionModel, GridSortItem, GridToolbarQuickFilter, GridValueGetterParams } from '@mui/x-data-grid';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import { DataGrid, GridColDef, GridFilterModel, GridSelectionModel, GridSortItem, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { useSnackbar } from 'notistack';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import EditRoadIcon from '@mui/icons-material/EditRoad';
 import PersonPinIcon from '@mui/icons-material/PersonPin';
 import LockClockIcon from '@mui/icons-material/LockClock';
-import { minWidth } from '@mui/system';
 
 
 export default function Clients() {
@@ -188,8 +168,6 @@ export default function Clients() {
       });
   }, []);
 
-  const modificationToolTip = `Modyfikował: ${selectedClientInformation?.opeModyfikowal} \n
-  Data modyfikacji: ${selectedClientInformation?.dataModyfikacji}`;
 
   return (
     <Box sx={{ flexGrow: 1 }}>

@@ -1,5 +1,4 @@
 import Api from './ApiGlobal';
-import apiConfig from './ApiGlobal';
 
 export type ClientInformationType = {
   id: number,

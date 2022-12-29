@@ -1,5 +1,4 @@
 import Api from './ApiGlobal';
-import { apiConfig } from './ApiGlobal';
 
 export type LoginData = { login: string, password: string, name:string, roleId: number, token: string}
 

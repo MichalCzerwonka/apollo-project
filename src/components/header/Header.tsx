@@ -14,9 +14,8 @@ import Divider from '@mui/material/Divider';
 import { getWeather } from '../../api/ApiWeather';
 import { DanePogodowe } from '../../api/ApiWeather';
 import { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import { useSnackbar } from 'notistack';
 
 interface HeaderProps {
     onDrawerToggle: () => void;

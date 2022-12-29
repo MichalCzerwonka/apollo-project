@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import Navigator from '../navigator/Navigator';
 import Header from '../header/Header';
 import Copyright from '../Copyright';
-import Clients from '../content/Clients';
 import { theme } from '../../App';
 import { Outlet } from 'react-router-dom';
 

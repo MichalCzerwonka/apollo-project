@@ -6,16 +6,11 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Client, postNewClient, putEditClient } from '../../../api/ApiClients';
-import React, { useContext, useEffect, useState } from 'react';
-import Alert, { AlertProps } from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import CloseIcon from '@mui/icons-material/Close';
-import IconButton from '@mui/material/IconButton';
+import React, { useEffect } from 'react';
 import Stack from '@mui/material/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
-import { Navigate } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { SnackbarProvider, useSnackbar } from 'notistack'
+import { useSnackbar } from 'notistack'
 import Checkbox from '@mui/material/Checkbox/Checkbox';
 
 interface ClientAddEditFormProps {
@@ -45,7 +40,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
     const submitHandler: SubmitHandler<Client> = (data: Client) => {
         if (isEdit) {
             putEditClient(data)
-                .then((res: any) => {
+                .then(() => {
                     enqueueSnackbar('Zmiany zostały wprowadzone.', {
                         anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
@@ -66,7 +61,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         }
         else {
             postNewClient(data)
-                .then((res: any) => {
+                .then(() => {
                     enqueueSnackbar('Klient został dodany.', {
                         anchorOrigin: { vertical: "bottom", horizontal: "left" },
                         variant: "info",
@@ -95,7 +90,7 @@ const ClientAddEditForm: React.FC<ClientAddEditFormProps> = ({ onClose, client }
         });
     }, []);
 
-    const { control, register, handleSubmit, watch, reset, formState: { errors } } = useForm<Client>({ resolver: yupResolver(addClientSchema), defaultValues: client });
+    const { control, handleSubmit, formState: { errors } } = useForm<Client>({ resolver: yupResolver(addClientSchema), defaultValues: client });
     return <form onSubmit={handleSubmit(submitHandler)} className="form">
         <br />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '20px' }}>

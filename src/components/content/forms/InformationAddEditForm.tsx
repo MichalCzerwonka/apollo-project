@@ -1,19 +1,17 @@
-import { useForm, SubmitHandler, Controller, FieldValues } from 'react-hook-form';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import BlockIcon from '@mui/icons-material/Block';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Client, ClientInformation, ClientInformationType, postNewClientInformation, putEditClientInformation } from '../../../api/ApiClients';
-import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@mui/material/Autocomplete/Autocomplete';
 import Stack from '@mui/material/Stack/Stack';
 import SaveAsIcon from '@mui/icons-material/SaveAs';
 import PostAddIcon from '@mui/icons-material/PostAdd';
-import { Checkbox, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material';
-import { SnackbarProvider, useSnackbar } from 'notistack'
+import { Checkbox, MenuItem } from '@mui/material';
+import { useSnackbar } from 'notistack'
 
 interface InformationAddEditFormProps {
     onClose: () => void,
